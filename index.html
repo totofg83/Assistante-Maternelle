@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur Assistante Maternelle</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #F0F4F8;
+    color: #1a1a2e;
+    min-height: 100vh;
+    padding: 28px 24px;
+  }
+  h1 { text-align: center; font-size: 22px; color: #1A237E; margin-bottom: 4px; }
+  .subtitle { text-align: center; font-size: 13px; color: #888; margin-bottom: 24px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .card h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1A237E;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #E8EAF6;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #9E9E9E;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin: 14px 0 6px;
+  }
+
+  /* INPUTS */
+  .field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .field label { font-size: 13px; color: #444; flex: 1; }
+  .field input, .field select {
+    width: 92px;
+    text-align: right;
+    padding: 5px 9px;
+    border: 1.5px solid #C5CAE9;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #1a1a2e;
+    outline: none;
+    background: white;
+    transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus { border-color: #3F51B5; }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .toggle-row label { font-size: 13px; color: #444; flex:1; }
+  .toggle-wrap { display: flex; border: 1.5px solid #C5CAE9; border-radius: 6px; overflow: hidden; }
+  .toggle-wrap button {
+    flex: 1;
+    padding: 5px 10px;
+    font-size: 12px;
+    border: none;
+    background: white;
+    color: #555;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .toggle-wrap button.active { background: #3F51B5; color: white; font-weight: 600; }
+
+  /* RESULTS */
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #F5F5F5;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-row .label { font-size: 13px; color: #555; }
+  .result-row .value { font-size: 13px; font-weight: 600; color: #212121; }
+  .value.blue  { color: #1565C0; }
+  .value.red   { color: #C62828; }
+  .value.green { color: #2E7D32; }
+  .value.gray  { color: #9E9E9E; }
+  .highlight-row {
+    background: #F9FBE7;
+    border-radius: 7px;
+    padding: 9px 8px;
+    margin: 6px 0 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .highlight-row .label { font-size: 13px; font-weight: 700; color: #212121; }
+  .highlight-row .value { font-size: 16px; font-weight: 700; }
+
+  hr.sep { border: none; border-top: 1.5px solid #EEEEEE; margin: 8px 0; }
+  .footer {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 11px;
+    color: #aaa;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>Simulateur Assistante Maternelle</h1>
+<p class="subtitle">Estimation du coût et du reste à charge</p>
+
+<div class="grid">
+  <!-- ══ INPUTS ══ -->
+  <div class="card">
+    <h2>Conditions de garde</h2>
+
+    <div class="section-title">Rémunération</div>
+    <div class="field">
+      <label>Tarif horaire net (€)</label>
+      <input type="number" inputmode="decimal" id="tarif_horaire_net" value="5.30" step="0.1" min="0">
+    </div>
+    <div class="field">
+      <label>Heures par jour</label>
+      <input type="number" inputmode="decimal" id="heures_par_jour" value="9" step="0.5" min="0">
+    </div>
+    <div class="field">
+      <label>Jours par semaine</label>
+      <input type="number" inputmode="decimal" id="jours_par_semaine" value="4" step="0.5" min="0">
+    </div>
+    <div class="field">
+      <label id="lbl_semaines">Semaines / an <span style="color:#999;font-size:11px">(CP inclus)</span></label>
+      <input type="number" inputmode="decimal" id="semaines_par_an" value="50" step="1" min="0">
+    </div>
+
+    <div class="section-title">Congés payés</div>
+    <div class="field">
+      <label>Jours CP / an <span style="color:#999;font-size:11px">(jours ouvrables)</span></label>
+      <input type="number" inputmode="decimal" id="nb_jours_cp" value="30" step="1" min="0" max="60">
+    </div>
+    <div class="toggle-row">
+      <label>Mode de paiement CP</label>
+      <div class="toggle-wrap">
+        <button id="btn_lissage" class="active" onclick="setMode('lissage')">Lissage</button>
+        <button id="btn_separe" onclick="setMode('separe')">Séparé</button>
+      </div>
+    </div>
+
+    <div class="section-title">Frais &amp; Foyer</div>
+    <div class="field">
+      <label>Frais d'entretien / jour (€)</label>
+      <input type="number" inputmode="decimal" id="frais_entretien_jour" value="5.00" step="0.5" min="0">
+    </div>
+    <div class="field">
+      <label>Jours travaillés / mois</label>
+      <input type="number" inputmode="decimal" id="nb_jours_mois" value="17" step="1" min="0">
+    </div>
+    <div class="field">
+      <label>Revenus du foyer / mois (€)</label>
+      <input type="number" inputmode="decimal" id="revenus_mensuels" value="4000" step="100" min="0">
+    </div>
+    <div class="field">
+      <label>Nb enfants à charge (CMG)</label>
+      <input type="number" inputmode="decimal" id="nb_enfants" value="1" step="1" min="1" max="5">
+    </div>
+    <div class="field">
+      <label>Coût horaire de référence CAF (€)</label>
+      <input type="number" inputmode="decimal" id="cout_ref" value="4.91" step="0.05" min="0">
+    </div>
+
+    <div class="section-title">Crédit d'impôt</div>
+    <div class="field">
+      <label>Nb enfants &lt; 6 ans</label>
+      <input type="number" inputmode="decimal" id="nb_enfants_ci" value="1" step="1" min="0" max="5">
+    </div>
+    <div class="field">
+      <label>Frais de repas / jour (€) <span style="color:#999;font-size:11px">(exclus)</span></label>
+      <input type="number" inputmode="decimal" id="frais_repas_jour" value="0" step="0.5" min="0">
+    </div>
+    <div class="field">
+      <label>Garde alternée</label>
+      <select id="garde_alternee">
+        <option value="0">Non</option>
+        <option value="1">Oui</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ══ RESULTS ══ -->
+  <div class="card">
+    <h2>Bilan financier employeur</h2>
+
+    <div class="section-title">Salaire</div>
+    <div class="result-row">
+      <span class="label">Tarif journalier net</span>
+      <span class="value" id="r_tjn">—</span>
+    </div>
+    <div class="result-row">
+      <span class="label">Tarif journalier brut</span>
+      <span class="value" id="r_tjb">—</span>
+    </div>
+    <div class="result-row">
+      <span class="label" id="lbl_snm">Salaire net mensuel (CP inclus)</span>
+      <span class="value" id="r_snm">—</span>
+    </div>
+    <div class="result-row">
+      <span class="label" id="lbl_sbm">Salaire brut mensuel (CP inclus)</span>
+      <span class="value" id="r_sbm">—</span>
+    </div>
+
+    <div class="section-title">Congés payés</div>
+    <div class="result-row">
+      <span class="label">Semaines CP</span>
+      <span class="value" id="r_cp_weeks">—</span>
+    </div>
+    <div class="result-row" id="row_cp_lissage">
+      <span class="label">Part CP dans le salaire / mois</span>
+      <span class="value gray" id="r_cp_lissage">—</span>
+    </div>
+    <div class="result-row" id="row_cp_separe" style="display:none">
+      <span class="label">Indemnité CP annuelle</span>
+      <span class="value" id="r_cp_annual">—</span>
+    </div>
+    <div class="result-row">
+      <span class="label">Total annuel net (CP inclus)</span>
+      <span class="value" id="r_tan">—</span>
+    </div>
+
+    <hr class="sep">
+
+    <div class="section-title">Coût mensuel employeur</div>
+    <div class="result-row">
+      <span class="label">Frais d'entretien / mois</span>
+      <span class="value" id="r_fem">—</span>
+    </div>
+    <div class="result-row">
+      <span class="label">Salaire net + frais</span>
+      <span class="value" id="r_snf">—</span>
+    </div>
+
+    <hr class="sep">
+
+    <div class="section-title">CMG (CAF)</div>
+    <div class="result-row">
+      <span class="label">CMG estimé</span>
+      <span class="value blue" id="r_cmg">—</span>
+    </div>
+    <div class="highlight-row">
+      <span class="label">Reste à charge / mois</span>
+      <span class="value" id="r_rac">—</span>
+    </div>
+    <div class="result-row">
+      <span class="label">Reste à charge / an</span>
+      <span class="value" id="r_ran">—</span>
+    </div>
+
+    <hr class="sep">
+
+    <div class="section-title">Crédit d'impôt (art. 200 quater B)</div>
+    <div class="result-row">
+      <span class="label">Crédit d'impôt / an (50%)</span>
+      <span class="value blue" id="r_ci">—</span>
+    </div>
+    <div class="highlight-row">
+      <span class="label">Coût réel net / mois</span>
+      <span class="value" id="r_net">—</span>
+    </div>
+    <div class="result-row">
+      <span class="label">Coût réel net / an</span>
+      <span class="value" id="r_netan">—</span>
+    </div>
+  </div>
+</div>
+
+<p class="footer">⚠ CMG et crédit d'impôt sont des estimations — vérifiez sur pajemploi.urssaf.fr et impots.gouv.fr</p>
+
+<script>
+const TAUX_BRUT_NET = 0.781116;
+const TAUX_EFFORT  = [0.000619, 0.000516, 0.000413, 0.000310, 0.000206];
+let modeCP = "lissage";
+
+function updateNjmDefault() {
+  const jpw = parseFloat(document.getElementById("jours_par_semaine").value) || 0;
+  const wpy = parseFloat(document.getElementById("semaines_par_an").value)   || 0;
+  document.getElementById("nb_jours_mois").value = Math.ceil(jpw * wpy / 12);
+}
+
+function setMode(m) {
+  modeCP = m;
+  document.getElementById("btn_lissage").classList.toggle("active", m === "lissage");
+  document.getElementById("btn_separe").classList.toggle("active",  m === "separe");
+  document.getElementById("row_cp_lissage").style.display = m === "lissage" ? "" : "none";
+  document.getElementById("row_cp_separe").style.display  = m === "separe"  ? "" : "none";
+  document.getElementById("lbl_semaines").innerHTML = m === "lissage"
+    ? "Semaines / an <span style='color:#999;font-size:11px'>(CP inclus)</span>"
+    : "Semaines de garde / an <span style='color:#999;font-size:11px'>(hors CP)</span>";
+  document.getElementById("semaines_par_an").value = m === "lissage" ? 50 : 45;
+  updateNjmDefault();
+  calculate();
+}
+
+function getTaux(n) {
+  return TAUX_EFFORT[Math.min(Math.max(Math.round(n) - 1, 0), 4)];
+}
+function fmt(v)   { return v.toLocaleString("fr-FR", {minimumFractionDigits:2, maximumFractionDigits:2}) + " €"; }
+function fmtN(v)  { return v.toLocaleString("fr-FR", {minimumFractionDigits:1, maximumFractionDigits:1}); }
+function val(id)  {
+  const raw = (document.getElementById(id).value || "").replace(",", ".");
+  return parseFloat(raw) || 0;
+}
+function set(id, text, cls) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = "value " + (cls || "");
+}
+
+function calculate() {
+  const thn     = val("tarif_horaire_net");
+  const hpj     = val("heures_par_jour");
+  const jpw     = val("jours_par_semaine");
+  const wpy     = val("semaines_par_an");       // total semaines CP inclus
+  const nbCp    = val("nb_jours_cp");
+  const fej     = val("frais_entretien_jour");
+  const njm     = val("nb_jours_mois");
+  const rev     = val("revenus_mensuels");
+  const nbe     = val("nb_enfants");
+  const coutRef = val("cout_ref");
+
+  const tjn      = thn * hpj;
+  const cp_weeks = nbCp / 6;   // jours ouvrables → semaines
+
+  let snm, snm_hors_cp, cp_annual, cp_mensuel, cp_maintien, cp_1_10;
+
+  if (modeCP === "lissage") {
+    // wpy inclut les CP — le salaire lissé est simplement tjn × jpw × wpy / 12
+    snm          = tjn * jpw * wpy / 12;
+    const work_w = Math.max(0, wpy - cp_weeks);
+    snm_hors_cp  = tjn * jpw * work_w / 12;
+    cp_mensuel   = snm - snm_hors_cp;
+    cp_maintien  = cp_mensuel * 12;
+    cp_1_10      = tjn * jpw * work_w / 10;
+    cp_annual    = cp_maintien; // en lissage c'est implicitement le maintien
+  } else {
+    // wpy = semaines de garde hors CP
+    snm_hors_cp   = tjn * jpw * wpy / 12;
+    const ann_w   = tjn * jpw * wpy;
+    cp_maintien   = tjn * jpw * cp_weeks;
+    cp_1_10       = ann_w / 10;
+    cp_annual     = Math.max(cp_maintien, cp_1_10);
+    cp_mensuel    = cp_annual / 12;
+    snm           = snm_hors_cp + cp_mensuel;
+  }
+  const tjb = tjn / TAUX_BRUT_NET;
+  const sbm = snm / TAUX_BRUT_NET;
+  const tan = snm * 12;
+
+  // ── Frais ─────────────────────────────────────────────────────────
+  const fem      = fej * njm;
+  const snf_lisse = snm + fem;           // base CMG : toujours valeur lissée CP inclus
+  const snf_display = (modeCP === "lissage" ? snm : snm_hors_cp) + fem;
+
+  // ── CMG ───────────────────────────────────────────────────────────
+  const taux = getTaux(nbe);
+  const hpm  = coutRef > 0 ? snf_lisse / coutRef : 0;
+  const cmg  = Math.max(0, coutRef - taux * rev) * hpm;
+  const rac  = snf_lisse - cmg;
+
+  // ── Crédit d'impôt (art. 200 quater B) ───────────────────────────
+  const nbCi       = Math.round(val("nb_enfants_ci"));
+  const fraisRepas = val("frais_repas_jour") * njm * 12;
+  const gardeAlt   = parseInt(document.getElementById("garde_alternee").value);
+  const plafond    = (gardeAlt ? 1750 : 3500) * nbCi;
+  // En mode séparé, le rac mensuel exclut le CP → on réintègre cp_annual dans la base annuelle
+  const baseCI     = Math.max(0, rac * 12 - fraisRepas);
+  const assiette   = Math.min(baseCI, plafond);
+  const ci         = assiette * 0.5;
+  const coutNet    = rac - ci / 12;
+
+  // ── Affichage ─────────────────────────────────────────────────────
+  const lissage = modeCP === "lissage";
+
+  set("r_tjn", fmt(tjn));
+  set("r_tjb", fmt(tjb));
+
+  // Salaire mensuel : CP inclus en lissage, hors CP en séparé
+  set("r_snm", lissage ? fmt(snm) : fmt(snm_hors_cp));
+  set("r_sbm", lissage ? fmt(sbm) : fmt(snm_hors_cp / TAUX_BRUT_NET));
+  document.getElementById("lbl_snm").textContent = lissage
+    ? "Salaire net mensuel (CP inclus)" : "Salaire net mensuel (hors CP)";
+  document.getElementById("lbl_sbm").textContent = lissage
+    ? "Salaire brut mensuel (CP inclus)" : "Salaire brut mensuel (hors CP)";
+
+  set("r_cp_weeks", fmtN(cp_weeks) + " sem.");
+  if (lissage) {
+    set("r_cp_lissage", fmt(cp_mensuel), "gray");
+  } else {
+    set("r_cp_annual",
+      fmt(cp_annual) + " (" + (cp_maintien >= cp_1_10 ? "maintien" : "1/10") + ")", "");
+  }
+
+  set("r_tan",   fmt(tan));
+  set("r_fem",   fmt(fem));
+  set("r_snf",   fmt(snf_display));
+  set("r_cmg",   fmt(cmg),       "blue");
+  set("r_rac",   fmt(rac),       rac > 0 ? "red" : "green");
+  set("r_ran",   fmt(rac * 12),  rac > 0 ? "red" : "green");
+  set("r_ci",    nbCi > 0 ? fmt(ci)           : "—", "blue");
+  set("r_net",   nbCi > 0 ? fmt(coutNet)      : "—", coutNet > 0 ? "red" : "green");
+  set("r_netan", nbCi > 0 ? fmt(coutNet * 12) : "—", coutNet > 0 ? "red" : "green");
+}
+
+document.querySelectorAll("input").forEach(el => el.addEventListener("input", calculate));
+document.getElementById("garde_alternee").addEventListener("change", calculate);
+["jours_par_semaine", "semaines_par_an"].forEach(id => {
+  document.getElementById(id).addEventListener("input", updateNjmDefault);
+});
+updateNjmDefault();
+calculate();
+</script>
+</body>
+</html>
