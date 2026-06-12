@@ -266,12 +266,20 @@
 
     <div class="section-title">CMG (CAF)</div>
     <div class="result-row">
-      <span class="label">CMG estimé</span>
+      <span class="label" id="lbl_cmg">CMG estimé</span>
       <span class="value blue" id="r_cmg">—</span>
+    </div>
+    <div class="result-row" id="row_cmg_cp" style="display:none">
+      <span class="label">CMG mois avec 1 sem. CP <span style="color:#999;font-size:11px">(montant payé réduit)</span></span>
+      <span class="value blue" id="r_cmg_cp">—</span>
     </div>
     <div class="highlight-row">
       <span class="label">Reste à charge / mois</span>
       <span class="value" id="r_rac">—</span>
+    </div>
+    <div class="result-row" id="row_rac_cp" style="display:none">
+      <span class="label">Reste à charge mois avec 1 sem. CP</span>
+      <span class="value" id="r_rac_cp">—</span>
     </div>
     <div class="result-row">
       <span class="label">Reste à charge / an</span>
@@ -384,10 +392,12 @@ function calculate() {
   const snf_display = (modeCP === "lissage" ? snm : snm_hors_cp) + fem;
 
   // ── CMG ───────────────────────────────────────────────────────────
-  const taux = getTaux(nbe);
-  const hpm  = coutRef > 0 ? snf_lisse / coutRef : 0;
-  const cmg  = Math.max(0, coutRef - taux * rev) * hpm;
-  const rac  = snf_lisse - cmg;
+  // Formule : CMG = coût mensuel × (1 - (revenus × taux_effort) / coût_horaire_ref)
+  // Base : snf_display (lissage → CP inclus, séparé → hors CP car non déclaré à la CAF)
+  const taux    = getTaux(nbe);
+  const facteur = coutRef > 0 ? Math.max(0, 1 - (rev * taux) / coutRef) : 0;
+  const cmg     = snf_display * facteur;
+  const rac     = snf_display - cmg;
 
   // ── Crédit d'impôt (art. 200 quater B) ───────────────────────────
   const nbCi       = Math.round(val("nb_enfants_ci"));
@@ -425,9 +435,24 @@ function calculate() {
   set("r_tan",   fmt(tan));
   set("r_fem",   fmt(fem));
   set("r_snf",   fmt(snf_display));
-  set("r_cmg",   fmt(cmg),       "blue");
-  set("r_rac",   fmt(rac),       rac > 0 ? "red" : "green");
-  set("r_ran",   fmt(rac * 12),  rac > 0 ? "red" : "green");
+  // CMG mois avec 1 semaine de CP (mode séparé uniquement)
+  // Base réduite : montant payé = salaire + frais pour (njm - jpw) jours travaillés
+  // Mois avec 1 sem. CP : salaire normal + indemnité CP d'1 semaine - frais d'entretien de la semaine CP
+  const cp_per_week  = cp_weeks > 0 ? cp_annual / cp_weeks : 0;
+  const snf_cp_month = snf_display + cp_per_week - fej * jpw;
+  const cmg_cp       = snf_cp_month * facteur;
+  const rac_cp       = snf_cp_month - cmg_cp;
+
+  const isSepare = modeCP === "separe";
+  document.getElementById("lbl_cmg").textContent     = isSepare ? "CMG mois sans CP" : "CMG estimé";
+  document.getElementById("row_cmg_cp").style.display = isSepare ? "" : "none";
+  document.getElementById("row_rac_cp").style.display  = isSepare ? "" : "none";
+
+  set("r_cmg",    fmt(cmg),    "blue");
+  set("r_cmg_cp", fmt(cmg_cp), "blue");
+  set("r_rac",    fmt(rac),    rac > 0 ? "red" : "green");
+  set("r_rac_cp", fmt(rac_cp), rac_cp > 0 ? "red" : "green");
+  set("r_ran",    fmt(rac * 12), rac > 0 ? "red" : "green");
   set("r_ci",    nbCi > 0 ? fmt(ci)           : "—", "blue");
   set("r_net",   nbCi > 0 ? fmt(coutNet)      : "—", coutNet > 0 ? "red" : "green");
   set("r_netan", nbCi > 0 ? fmt(coutNet * 12) : "—", coutNet > 0 ? "red" : "green");
