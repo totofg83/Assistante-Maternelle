@@ -575,13 +575,13 @@ function calculateScenario(s) {
   const cmg_cp       = snf_cp_month * facteur;
   const rac_cp       = snf_cp_month - cmg_cp;
 
-  // Store for comparison
-  const snm_display = lissage ? snm : snm_hors_cp;
-  results[s] = { cmg, rac, ci, coutNet, tan, snm: snm_display };
-
   // Display
   const lissage = modeCP[s] === 'lissage';
   const separe  = !lissage;
+
+  // Store for comparison
+  const snm_display = lissage ? snm : snm_hors_cp;
+  results[s] = { cmg, rac, ci, coutNet, tan, snm: snm_display };
 
   set(s, 'tjn', fmt(tjn));
   set(s, 'tjb', fmt(tjb));
