@@ -14,7 +14,24 @@
     padding: 28px 24px;
   }
   h1 { text-align: center; font-size: 22px; color: #1A237E; margin-bottom: 4px; }
-  .subtitle { text-align: center; font-size: 13px; color: #888; margin-bottom: 24px; }
+  .subtitle { text-align: center; font-size: 13px; color: #888; margin-bottom: 16px; }
+
+  .compare-bar {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .compare-btn {
+    padding: 8px 22px;
+    border: 2px solid #3F51B5;
+    border-radius: 8px;
+    background: white;
+    color: #3F51B5;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .compare-btn:hover, .compare-btn.active { background: #3F51B5; color: white; }
 
   .grid {
     display: grid;
@@ -23,12 +40,15 @@
     max-width: 900px;
     margin: 0 auto;
   }
+  .grid.compare-mode { max-width: 1800px; }
+
   .card {
     background: white;
     border-radius: 12px;
     padding: 20px 22px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.07);
   }
+  .card.scenario-b { border-top: 3px solid #7B1FA2; }
   .card h2 {
     font-size: 14px;
     font-weight: 700;
@@ -39,6 +59,7 @@
     text-transform: uppercase;
     letter-spacing: .5px;
   }
+  .card.scenario-b h2 { color: #7B1FA2; border-bottom-color: #EDE7F6; }
   .section-title {
     font-size: 11px;
     font-weight: 700;
@@ -48,7 +69,6 @@
     margin: 14px 0 6px;
   }
 
-  /* INPUTS */
   .field {
     display: flex;
     align-items: center;
@@ -69,6 +89,8 @@
     transition: border-color 0.2s;
   }
   .field input:focus, .field select:focus { border-color: #3F51B5; }
+  .scenario-b .field input:focus, .scenario-b .field select:focus { border-color: #7B1FA2; }
+
   .toggle-row {
     display: flex;
     align-items: center;
@@ -88,8 +110,8 @@
     transition: background .15s, color .15s;
   }
   .toggle-wrap button.active { background: #3F51B5; color: white; font-weight: 600; }
+  .scenario-b .toggle-wrap button.active { background: #7B1FA2; }
 
-  /* RESULTS */
   .result-row {
     display: flex;
     justify-content: space-between;
@@ -101,6 +123,7 @@
   .result-row .label { font-size: 13px; color: #555; }
   .result-row .value { font-size: 13px; font-weight: 600; color: #212121; }
   .value.blue  { color: #1565C0; }
+  .value.purple{ color: #6A1B9A; }
   .value.red   { color: #C62828; }
   .value.green { color: #2E7D32; }
   .value.gray  { color: #9E9E9E; }
@@ -117,6 +140,26 @@
   .highlight-row .value { font-size: 16px; font-weight: 700; }
 
   hr.sep { border: none; border-top: 1.5px solid #EEEEEE; margin: 8px 0; }
+
+  /* Panneau de comparaison */
+  #compare_panel {
+    max-width: 900px;
+    margin: 20px auto 0;
+  }
+  .cmp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .cmp-table th { padding: 8px 12px; text-align: center; font-size: 13px; }
+  .cmp-table th.s1 { color: #1A237E; }
+  .cmp-table th.s2 { color: #7B1FA2; }
+  .cmp-table td { padding: 8px 12px; border-bottom: 1px solid #F0F0F0; }
+  .cmp-table td.lbl { color: #555; font-size: 13px; }
+  .cmp-table td.val { text-align: center; font-weight: 600; }
+  .cmp-table tr.winner td { background: #F1F8E9; }
+  .cmp-diff { text-align: center; font-size: 12px; color: #888; padding: 6px 12px; font-style: italic; }
+
   .footer {
     text-align: center;
     margin-top: 18px;
@@ -126,35 +169,10 @@
     margin-left: auto;
     margin-right: auto;
   }
-  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 720px) {
+    .grid, .grid.compare-mode { grid-template-columns: 1fr; }
+  }
 
-  /* Mode PDF : tout compact sur une page */
-  body.pdf-mode { padding: 0; background: white; }
-  body.pdf-mode h1 { font-size: 15px; margin-bottom: 2px; }
-  body.pdf-mode .subtitle { font-size: 11px; margin-bottom: 10px; }
-  body.pdf-mode .grid { max-width: 100%; gap: 10px; padding: 0 8px; }
-  body.pdf-mode .card { padding: 10px 12px; box-shadow: none; border: 1px solid #ddd; }
-  body.pdf-mode .card h2 { font-size: 11px; margin-bottom: 8px; padding-bottom: 5px; }
-  body.pdf-mode .section-title { font-size: 9px; margin: 8px 0 4px; }
-  body.pdf-mode .field { margin-bottom: 5px; }
-  body.pdf-mode .field label,
-  body.pdf-mode .field input,
-  body.pdf-mode .field select { font-size: 10px; }
-  body.pdf-mode .field input,
-  body.pdf-mode .field select { width: 72px; padding: 3px 6px; border: 1px solid #ccc; }
-  body.pdf-mode .result-row { padding: 5px 0; }
-  body.pdf-mode .result-row .label,
-  body.pdf-mode .result-row .value { font-size: 10px; }
-  body.pdf-mode .highlight-row { padding: 5px 6px; margin: 3px 0; }
-  body.pdf-mode .highlight-row .label { font-size: 10px; }
-  body.pdf-mode .highlight-row .value { font-size: 13px; }
-  body.pdf-mode .toggle-wrap { display: none; }
-  body.pdf-mode .toggle-row label::after { content: attr(data-mode); font-weight: 600; }
-  body.pdf-mode hr.sep { margin: 5px 0; }
-  body.pdf-mode .export-btn { display: none; }
-  body.pdf-mode .footer { font-size: 9px; margin-top: 8px; }
-
-  /* Bouton export */
   .export-btn {
     display: block;
     margin: 16px auto 0;
@@ -170,21 +188,13 @@
   }
   .export-btn:hover { background: #283593; }
 
-  /* CSS d'impression */
   @media print {
-    body { background: white; padding: 10px; font-size: 12px; }
-    .export-btn, .toggle-wrap, button { display: none !important; }
+    body { background: white; padding: 10px; }
+    .export-btn, .compare-btn, .toggle-wrap, button { display: none !important; }
     .grid { grid-template-columns: 1fr 1fr; gap: 12px; }
     .card { box-shadow: none; border: 1px solid #ddd; padding: 14px; }
-    .field input, .field select {
-      border: none; background: transparent;
-      font-weight: 600; color: #1a1a2e;
-      -webkit-appearance: none; appearance: none;
-    }
+    .field input, .field select { border: none; background: transparent; font-weight: 600; -webkit-appearance: none; }
     .highlight-row { background: #f5f5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .footer { font-size: 10px; }
-    h1 { font-size: 16px; }
-    .section-title { margin-top: 10px; }
   }
 </style>
 </head>
@@ -193,10 +203,15 @@
 <h1>Simulateur Assistante Maternelle</h1>
 <p class="subtitle">Estimation du coût et du reste à charge</p>
 
-<div class="grid">
-  <!-- ══ INPUTS ══ -->
-  <div class="card">
-    <h2>Conditions de garde</h2>
+<div class="compare-bar">
+  <button class="compare-btn" id="btn_compare_toggle" onclick="toggleCompare()">⇄ Comparer 2 scénarios</button>
+</div>
+
+<div class="grid" id="main_grid">
+
+  <!-- ══ INPUTS A ══ -->
+  <div class="card" id="card_in_a">
+    <h2 id="lbl_card_in_a">Conditions de garde</h2>
 
     <div class="section-title">Rémunération</div>
     <div class="field">
@@ -212,7 +227,7 @@
       <input type="number" inputmode="decimal" id="jours_par_semaine" value="4" step="0.5" min="0">
     </div>
     <div class="field">
-      <label id="lbl_semaines">Semaines / an <span style="color:#999;font-size:11px">(CP inclus)</span></label>
+      <label id="lbl_semaines_a">Semaines / an <span style="color:#999;font-size:11px">(CP inclus)</span></label>
       <input type="number" inputmode="decimal" id="semaines_par_an" value="50" step="1" min="0">
     </div>
 
@@ -224,8 +239,8 @@
     <div class="toggle-row">
       <label>Mode de paiement CP</label>
       <div class="toggle-wrap">
-        <button id="btn_lissage" class="active" onclick="setMode('lissage')">Lissage</button>
-        <button id="btn_separe" onclick="setMode('separe')">Séparé</button>
+        <button id="btn_lissage_a" class="active" onclick="setMode('lissage','a')">Lissage</button>
+        <button id="btn_separe_a" onclick="setMode('separe','a')">Séparé</button>
       </div>
     </div>
 
@@ -269,97 +284,177 @@
     </div>
   </div>
 
-  <!-- ══ RESULTS ══ -->
-  <div class="card">
-    <h2>Bilan financier employeur</h2>
+  <!-- ══ INPUTS B (hidden by default) ══ -->
+  <div class="card scenario-b" id="card_in_b" style="display:none">
+    <h2>Scénario 2 — Conditions de garde</h2>
 
-    <div class="section-title">Salaire</div>
-    <div class="result-row">
-      <span class="label">Tarif journalier net</span>
-      <span class="value" id="r_tjn">—</span>
+    <div class="section-title">Rémunération</div>
+    <div class="field">
+      <label>Tarif horaire net (€)</label>
+      <input type="number" inputmode="decimal" id="b_tarif_horaire_net" value="5.30" step="0.1" min="0">
     </div>
-    <div class="result-row">
-      <span class="label">Tarif journalier brut</span>
-      <span class="value" id="r_tjb">—</span>
+    <div class="field">
+      <label>Heures par jour</label>
+      <input type="number" inputmode="decimal" id="b_heures_par_jour" value="9" step="0.5" min="0">
     </div>
-    <div class="result-row">
-      <span class="label" id="lbl_snm">Salaire net mensuel (CP inclus)</span>
-      <span class="value" id="r_snm">—</span>
+    <div class="field">
+      <label>Jours par semaine</label>
+      <input type="number" inputmode="decimal" id="b_jours_par_semaine" value="4" step="0.5" min="0">
     </div>
-    <div class="result-row">
-      <span class="label" id="lbl_sbm">Salaire brut mensuel (CP inclus)</span>
-      <span class="value" id="r_sbm">—</span>
+    <div class="field">
+      <label id="lbl_semaines_b">Semaines / an <span style="color:#999;font-size:11px">(CP inclus)</span></label>
+      <input type="number" inputmode="decimal" id="b_semaines_par_an" value="50" step="1" min="0">
     </div>
 
     <div class="section-title">Congés payés</div>
-    <div class="result-row">
-      <span class="label">Semaines CP</span>
-      <span class="value" id="r_cp_weeks">—</span>
+    <div class="field">
+      <label>Jours CP / an <span style="color:#999;font-size:11px">(jours ouvrables)</span></label>
+      <input type="number" inputmode="decimal" id="b_nb_jours_cp" value="30" step="1" min="0" max="60">
     </div>
-    <div class="result-row" id="row_cp_lissage">
-      <span class="label">Part CP dans le salaire / mois</span>
-      <span class="value gray" id="r_cp_lissage">—</span>
+    <div class="toggle-row">
+      <label>Mode de paiement CP</label>
+      <div class="toggle-wrap">
+        <button id="btn_lissage_b" class="active" onclick="setMode('lissage','b')">Lissage</button>
+        <button id="btn_separe_b" onclick="setMode('separe','b')">Séparé</button>
+      </div>
     </div>
-    <div class="result-row" id="row_cp_separe" style="display:none">
-      <span class="label">Indemnité CP annuelle</span>
-      <span class="value" id="r_cp_annual">—</span>
+
+    <div class="section-title">Frais &amp; Foyer</div>
+    <div class="field">
+      <label>Frais d'entretien / jour (€)</label>
+      <input type="number" inputmode="decimal" id="b_frais_entretien_jour" value="5.00" step="0.5" min="0">
     </div>
-    <div class="result-row">
-      <span class="label">Total annuel net (CP inclus)</span>
-      <span class="value" id="r_tan">—</span>
+    <div class="field">
+      <label>Jours travaillés / mois</label>
+      <input type="number" inputmode="decimal" id="b_nb_jours_mois" value="17" step="1" min="0">
     </div>
+    <div class="field">
+      <label>Revenus du foyer / mois (€)</label>
+      <input type="number" inputmode="decimal" id="b_revenus_mensuels" value="4000" step="100" min="0">
+    </div>
+    <div class="field">
+      <label>Nb enfants à charge (CMG)</label>
+      <input type="number" inputmode="decimal" id="b_nb_enfants" value="1" step="1" min="1" max="5">
+    </div>
+    <div class="field">
+      <label>Coût horaire de référence CAF (€)</label>
+      <input type="number" inputmode="decimal" id="b_cout_ref" value="4.91" step="0.05" min="0">
+    </div>
+
+    <div class="section-title">Crédit d'impôt</div>
+    <div class="field">
+      <label>Nb enfants &lt; 6 ans</label>
+      <input type="number" inputmode="decimal" id="b_nb_enfants_ci" value="1" step="1" min="0" max="5">
+    </div>
+    <div class="field">
+      <label>Frais de repas / jour (€) <span style="color:#999;font-size:11px">(exclus)</span></label>
+      <input type="number" inputmode="decimal" id="b_frais_repas_jour" value="0" step="0.5" min="0">
+    </div>
+    <div class="field">
+      <label>Garde alternée</label>
+      <select id="b_garde_alternee">
+        <option value="0">Non</option>
+        <option value="1">Oui</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ══ RESULTS A ══ -->
+  <div class="card" id="card_res_a">
+    <h2 id="lbl_card_res_a">Bilan financier employeur</h2>
+
+    <div class="section-title">Salaire</div>
+    <div class="result-row"><span class="label">Tarif journalier net</span><span class="value" id="r_tjn">—</span></div>
+    <div class="result-row"><span class="label">Tarif journalier brut</span><span class="value" id="r_tjb">—</span></div>
+    <div class="result-row"><span class="label" id="lbl_snm_a">Salaire net mensuel (CP inclus)</span><span class="value" id="r_snm">—</span></div>
+    <div class="result-row"><span class="label" id="lbl_sbm_a">Salaire brut mensuel (CP inclus)</span><span class="value" id="r_sbm">—</span></div>
+
+    <div class="section-title">Congés payés</div>
+    <div class="result-row"><span class="label">Semaines CP</span><span class="value" id="r_cp_weeks">—</span></div>
+    <div class="result-row" id="row_cp_lissage_a"><span class="label">Part CP dans le salaire / mois</span><span class="value gray" id="r_cp_lissage">—</span></div>
+    <div class="result-row" id="row_cp_separe_a" style="display:none"><span class="label">Indemnité CP annuelle</span><span class="value" id="r_cp_annual">—</span></div>
+    <div class="result-row"><span class="label">Total annuel net (CP inclus)</span><span class="value" id="r_tan">—</span></div>
 
     <hr class="sep">
-
     <div class="section-title">Coût mensuel employeur</div>
-    <div class="result-row">
-      <span class="label">Frais d'entretien / mois</span>
-      <span class="value" id="r_fem">—</span>
-    </div>
-    <div class="result-row">
-      <span class="label">Salaire net + frais</span>
-      <span class="value" id="r_snf">—</span>
-    </div>
+    <div class="result-row"><span class="label">Frais d'entretien / mois</span><span class="value" id="r_fem">—</span></div>
+    <div class="result-row"><span class="label">Salaire net + frais</span><span class="value" id="r_snf">—</span></div>
 
     <hr class="sep">
-
     <div class="section-title">CMG (CAF)</div>
-    <div class="result-row">
-      <span class="label" id="lbl_cmg">CMG estimé</span>
-      <span class="value blue" id="r_cmg">—</span>
-    </div>
-    <div class="result-row" id="row_cmg_cp" style="display:none">
-      <span class="label">CMG mois avec 1 sem. CP <span style="color:#999;font-size:11px">(montant payé réduit)</span></span>
-      <span class="value blue" id="r_cmg_cp">—</span>
-    </div>
-    <div class="highlight-row">
-      <span class="label">Reste à charge / mois</span>
-      <span class="value" id="r_rac">—</span>
-    </div>
-    <div class="result-row" id="row_rac_cp" style="display:none">
-      <span class="label">Reste à charge mois avec 1 sem. CP</span>
-      <span class="value" id="r_rac_cp">—</span>
-    </div>
-    <div class="result-row">
-      <span class="label">Reste à charge / an</span>
-      <span class="value" id="r_ran">—</span>
-    </div>
+    <div class="result-row"><span class="label" id="lbl_cmg_a">CMG estimé</span><span class="value blue" id="r_cmg">—</span></div>
+    <div class="result-row" id="row_cmg_cp_a" style="display:none"><span class="label">CMG mois avec 1 sem. CP</span><span class="value blue" id="r_cmg_cp">—</span></div>
+    <div class="highlight-row"><span class="label">Reste à charge / mois</span><span class="value" id="r_rac">—</span></div>
+    <div class="result-row" id="row_rac_cp_a" style="display:none"><span class="label">Reste à charge mois avec 1 sem. CP</span><span class="value" id="r_rac_cp">—</span></div>
+    <div class="result-row"><span class="label">Reste à charge / an</span><span class="value" id="r_ran">—</span></div>
 
     <hr class="sep">
-
     <div class="section-title">Crédit d'impôt (art. 200 quater B)</div>
-    <div class="result-row">
-      <span class="label">Crédit d'impôt / an (50%)</span>
-      <span class="value blue" id="r_ci">—</span>
-    </div>
-    <div class="highlight-row">
-      <span class="label">Coût réel net / mois</span>
-      <span class="value" id="r_net">—</span>
-    </div>
-    <div class="result-row">
-      <span class="label">Coût réel net / an</span>
-      <span class="value" id="r_netan">—</span>
-    </div>
+    <div class="result-row"><span class="label">Crédit d'impôt / an (50%)</span><span class="value blue" id="r_ci">—</span></div>
+    <div class="highlight-row"><span class="label">Coût réel net / mois</span><span class="value" id="r_net">—</span></div>
+    <div class="result-row"><span class="label">Coût réel net / an</span><span class="value" id="r_netan">—</span></div>
+  </div>
+
+  <!-- ══ RESULTS B (hidden by default) ══ -->
+  <div class="card scenario-b" id="card_res_b" style="display:none">
+    <h2>Scénario 2 — Bilan financier</h2>
+
+    <div class="section-title">Salaire</div>
+    <div class="result-row"><span class="label">Tarif journalier net</span><span class="value" id="b_r_tjn">—</span></div>
+    <div class="result-row"><span class="label">Tarif journalier brut</span><span class="value" id="b_r_tjb">—</span></div>
+    <div class="result-row"><span class="label" id="lbl_snm_b">Salaire net mensuel (CP inclus)</span><span class="value" id="b_r_snm">—</span></div>
+    <div class="result-row"><span class="label" id="lbl_sbm_b">Salaire brut mensuel (CP inclus)</span><span class="value" id="b_r_sbm">—</span></div>
+
+    <div class="section-title">Congés payés</div>
+    <div class="result-row"><span class="label">Semaines CP</span><span class="value" id="b_r_cp_weeks">—</span></div>
+    <div class="result-row" id="row_cp_lissage_b"><span class="label">Part CP dans le salaire / mois</span><span class="value gray" id="b_r_cp_lissage">—</span></div>
+    <div class="result-row" id="row_cp_separe_b" style="display:none"><span class="label">Indemnité CP annuelle</span><span class="value" id="b_r_cp_annual">—</span></div>
+    <div class="result-row"><span class="label">Total annuel net (CP inclus)</span><span class="value" id="b_r_tan">—</span></div>
+
+    <hr class="sep">
+    <div class="section-title">Coût mensuel employeur</div>
+    <div class="result-row"><span class="label">Frais d'entretien / mois</span><span class="value" id="b_r_fem">—</span></div>
+    <div class="result-row"><span class="label">Salaire net + frais</span><span class="value" id="b_r_snf">—</span></div>
+
+    <hr class="sep">
+    <div class="section-title">CMG (CAF)</div>
+    <div class="result-row"><span class="label" id="lbl_cmg_b">CMG estimé</span><span class="value purple" id="b_r_cmg">—</span></div>
+    <div class="result-row" id="row_cmg_cp_b" style="display:none"><span class="label">CMG mois avec 1 sem. CP</span><span class="value purple" id="b_r_cmg_cp">—</span></div>
+    <div class="highlight-row"><span class="label">Reste à charge / mois</span><span class="value" id="b_r_rac">—</span></div>
+    <div class="result-row" id="row_rac_cp_b" style="display:none"><span class="label">Reste à charge mois avec 1 sem. CP</span><span class="value" id="b_r_rac_cp">—</span></div>
+    <div class="result-row"><span class="label">Reste à charge / an</span><span class="value" id="b_r_ran">—</span></div>
+
+    <hr class="sep">
+    <div class="section-title">Crédit d'impôt (art. 200 quater B)</div>
+    <div class="result-row"><span class="label">Crédit d'impôt / an (50%)</span><span class="value purple" id="b_r_ci">—</span></div>
+    <div class="highlight-row"><span class="label">Coût réel net / mois</span><span class="value" id="b_r_net">—</span></div>
+    <div class="result-row"><span class="label">Coût réel net / an</span><span class="value" id="b_r_netan">—</span></div>
+  </div>
+
+</div>
+
+<!-- ══ COMPARE SUMMARY (hidden by default) ══ -->
+<div id="compare_panel" style="display:none">
+  <div class="card" style="margin-top:20px">
+    <h2>Comparaison des scénarios</h2>
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;color:#555"></th>
+          <th class="s1">Scénario 1</th>
+          <th class="s2">Scénario 2</th>
+          <th style="color:#888;font-size:12px">Différence</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="lbl">CMG / mois</td><td class="val" id="cmp_cmg_a">—</td><td class="val" id="cmp_cmg_b">—</td><td class="val" id="cmp_cmg_diff" style="color:#888;font-size:12px">—</td></tr>
+        <tr><td class="lbl">Reste à charge / mois</td><td class="val" id="cmp_rac_a">—</td><td class="val" id="cmp_rac_b">—</td><td class="val" id="cmp_rac_diff" style="font-size:12px">—</td></tr>
+        <tr><td class="lbl">Crédit d'impôt / mois</td><td class="val" id="cmp_ci_a">—</td><td class="val" id="cmp_ci_b">—</td><td class="val" id="cmp_ci_diff" style="color:#888;font-size:12px">—</td></tr>
+        <tr><td class="lbl">Coût réel net / mois</td><td class="val" id="cmp_net_a">—</td><td class="val" id="cmp_net_b">—</td><td class="val" id="cmp_net_diff" style="font-size:12px">—</td></tr>
+        <tr><td class="lbl">Coût réel net / an</td><td class="val" id="cmp_netan_a">—</td><td class="val" id="cmp_netan_b">—</td><td class="val" id="cmp_netan_diff" style="font-size:12px">—</td></tr>
+      </tbody>
+    </table>
+    <p id="cmp_verdict" class="cmp-diff"></p>
   </div>
 </div>
 
@@ -369,169 +464,244 @@
 <script>
 const TAUX_BRUT_NET = 0.781116;
 const TAUX_EFFORT  = [0.000619, 0.000516, 0.000413, 0.000310, 0.000206];
-let modeCP = "lissage";
+const modeCP = { a: 'lissage', b: 'lissage' };
+let compareMode = false;
 
-function updateNjmDefault() {
-  const jpw = parseFloat(document.getElementById("jours_par_semaine").value) || 0;
-  const wpy = parseFloat(document.getElementById("semaines_par_an").value)   || 0;
-  document.getElementById("nb_jours_mois").value = Math.ceil(jpw * wpy / 12);
+// Stored results for comparison panel
+const results = { a: {}, b: {} };
+
+function id(s, name) {
+  return s === 'b' ? 'b_' + name : name;
 }
 
-function setMode(m) {
-  modeCP = m;
-  document.getElementById("btn_lissage").classList.toggle("active", m === "lissage");
-  document.getElementById("btn_separe").classList.toggle("active",  m === "separe");
-  document.getElementById("row_cp_lissage").style.display = m === "lissage" ? "" : "none";
-  document.getElementById("row_cp_separe").style.display  = m === "separe"  ? "" : "none";
-  document.getElementById("lbl_semaines").innerHTML = m === "lissage"
-    ? "Semaines / an <span style='color:#999;font-size:11px'>(CP inclus)</span>"
-    : "Semaines de garde / an <span style='color:#999;font-size:11px'>(hors CP)</span>";
-  document.getElementById("semaines_par_an").value = m === "lissage" ? 50 : 45;
-  updateNjmDefault();
-  calculate();
+function val(s, name) {
+  const raw = (document.getElementById(id(s, name)).value || '').replace(',', '.');
+  return parseFloat(raw) || 0;
+}
+
+function set(s, name, text, cls) {
+  const el = document.getElementById(s === 'b' ? 'b_r_' + name : 'r_' + name);
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'value ' + (cls || '');
 }
 
 function getTaux(n) {
   return TAUX_EFFORT[Math.min(Math.max(Math.round(n) - 1, 0), 4)];
 }
-function fmt(v)   { return v.toLocaleString("fr-FR", {minimumFractionDigits:2, maximumFractionDigits:2}) + " €"; }
-function fmtN(v)  { return v.toLocaleString("fr-FR", {minimumFractionDigits:1, maximumFractionDigits:1}); }
-function val(id)  {
-  const raw = (document.getElementById(id).value || "").replace(",", ".");
-  return parseFloat(raw) || 0;
-}
-function set(id, text, cls) {
-  const el = document.getElementById(id);
-  el.textContent = text;
-  el.className = "value " + (cls || "");
+function fmt(v)  { return v.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €'; }
+function fmtN(v) { return v.toLocaleString('fr-FR', {minimumFractionDigits:1, maximumFractionDigits:1}); }
+
+function updateNjmDefault(s) {
+  const jpw = val(s, 'jours_par_semaine');
+  const wpy = val(s, 'semaines_par_an');
+  document.getElementById(id(s, 'nb_jours_mois')).value = Math.ceil(jpw * wpy / 12);
 }
 
-function calculate() {
-  const thn     = val("tarif_horaire_net");
-  const hpj     = val("heures_par_jour");
-  const jpw     = val("jours_par_semaine");
-  const wpy     = val("semaines_par_an");       // total semaines CP inclus
-  const nbCp    = val("nb_jours_cp");
-  const fej     = val("frais_entretien_jour");
-  const njm     = val("nb_jours_mois");
-  const rev     = val("revenus_mensuels");
-  const nbe     = val("nb_enfants");
-  const coutRef = val("cout_ref");
+function setMode(m, s) {
+  modeCP[s] = m;
+  document.getElementById('btn_lissage_' + s).classList.toggle('active', m === 'lissage');
+  document.getElementById('btn_separe_' + s).classList.toggle('active', m === 'separe');
+  document.getElementById('row_cp_lissage_' + s).style.display = m === 'lissage' ? '' : 'none';
+  document.getElementById('row_cp_separe_' + s).style.display  = m === 'separe'  ? '' : 'none';
+  const lblSem = document.getElementById('lbl_semaines_' + s);
+  lblSem.innerHTML = m === 'lissage'
+    ? "Semaines / an <span style='color:#999;font-size:11px'>(CP inclus)</span>"
+    : "Semaines de garde / an <span style='color:#999;font-size:11px'>(hors CP)</span>";
+  document.getElementById(id(s, 'semaines_par_an')).value = m === 'lissage' ? 50 : 45;
+  updateNjmDefault(s);
+  calculateScenario(s);
+}
+
+function calculateScenario(s) {
+  const thn     = val(s, 'tarif_horaire_net');
+  const hpj     = val(s, 'heures_par_jour');
+  const jpw     = val(s, 'jours_par_semaine');
+  const wpy     = val(s, 'semaines_par_an');
+  const nbCp    = val(s, 'nb_jours_cp');
+  const fej     = val(s, 'frais_entretien_jour');
+  const njm     = val(s, 'nb_jours_mois');
+  const rev     = val(s, 'revenus_mensuels');
+  const nbe     = val(s, 'nb_enfants');
+  const coutRef = val(s, 'cout_ref');
 
   const tjn      = thn * hpj;
-  const cp_weeks = nbCp / 6;   // jours ouvrables → semaines
-
+  const cp_weeks = nbCp / 6;
   let snm, snm_hors_cp, cp_annual, cp_mensuel, cp_maintien, cp_1_10;
 
-  if (modeCP === "lissage") {
-    // wpy inclut les CP — le salaire lissé est simplement tjn × jpw × wpy / 12
+  if (modeCP[s] === 'lissage') {
     snm          = tjn * jpw * wpy / 12;
     const work_w = Math.max(0, wpy - cp_weeks);
     snm_hors_cp  = tjn * jpw * work_w / 12;
     cp_mensuel   = snm - snm_hors_cp;
     cp_maintien  = cp_mensuel * 12;
     cp_1_10      = tjn * jpw * work_w / 10;
-    cp_annual    = cp_maintien; // en lissage c'est implicitement le maintien
+    cp_annual    = cp_maintien;
   } else {
-    // wpy = semaines de garde hors CP
-    snm_hors_cp   = tjn * jpw * wpy / 12;
-    const ann_w   = tjn * jpw * wpy;
-    cp_maintien   = tjn * jpw * cp_weeks;
-    cp_1_10       = ann_w / 10;
-    cp_annual     = Math.max(cp_maintien, cp_1_10);
-    cp_mensuel    = cp_annual / 12;
-    snm           = snm_hors_cp + cp_mensuel;
+    snm_hors_cp  = tjn * jpw * wpy / 12;
+    const ann_w  = tjn * jpw * wpy;
+    cp_maintien  = tjn * jpw * cp_weeks;
+    cp_1_10      = ann_w / 10;
+    cp_annual    = Math.max(cp_maintien, cp_1_10);
+    cp_mensuel   = cp_annual / 12;
+    snm          = snm_hors_cp + cp_mensuel;
   }
+
   const tjb = tjn / TAUX_BRUT_NET;
   const sbm = snm / TAUX_BRUT_NET;
   const tan = snm * 12;
+  const fem = fej * njm;
+  const snf_lisse   = snm + fem;
+  const snf_display = (modeCP[s] === 'lissage' ? snm : snm_hors_cp) + fem;
 
-  // ── Frais ─────────────────────────────────────────────────────────
-  const fem      = fej * njm;
-  const snf_lisse = snm + fem;           // base CMG : toujours valeur lissée CP inclus
-  const snf_display = (modeCP === "lissage" ? snm : snm_hors_cp) + fem;
-
-  // ── CMG ───────────────────────────────────────────────────────────
-  // Formule : CMG = coût mensuel × (1 - (revenus × taux_effort) / coût_horaire_ref)
-  // Base : snf_display (lissage → CP inclus, séparé → hors CP car non déclaré à la CAF)
   const taux    = getTaux(nbe);
   const facteur = coutRef > 0 ? Math.max(0, 1 - (rev * taux) / coutRef) : 0;
   const cmg     = snf_display * facteur;
   const rac     = snf_display - cmg;
 
-  // ── Crédit d'impôt (art. 200 quater B) ───────────────────────────
-  const nbCi       = Math.round(val("nb_enfants_ci"));
-  const fraisRepas = val("frais_repas_jour") * njm * 12;
-  const gardeAlt   = parseInt(document.getElementById("garde_alternee").value);
+  const nbCi       = Math.round(val(s, 'nb_enfants_ci'));
+  const fraisRepas = val(s, 'frais_repas_jour') * njm * 12;
+  const gardeAlt   = parseInt(document.getElementById(id(s, 'garde_alternee')).value);
   const plafond    = (gardeAlt ? 1750 : 3500) * nbCi;
-  // En mode séparé, le rac mensuel exclut le CP → on réintègre cp_annual dans la base annuelle
   const baseCI     = Math.max(0, rac * 12 - fraisRepas);
   const assiette   = Math.min(baseCI, plafond);
   const ci         = assiette * 0.5;
   const coutNet    = rac - ci / 12;
 
-  // ── Affichage ─────────────────────────────────────────────────────
-  const lissage = modeCP === "lissage";
-
-  set("r_tjn", fmt(tjn));
-  set("r_tjb", fmt(tjb));
-
-  // Salaire mensuel : CP inclus en lissage, hors CP en séparé
-  set("r_snm", lissage ? fmt(snm) : fmt(snm_hors_cp));
-  set("r_sbm", lissage ? fmt(sbm) : fmt(snm_hors_cp / TAUX_BRUT_NET));
-  document.getElementById("lbl_snm").textContent = lissage
-    ? "Salaire net mensuel (CP inclus)" : "Salaire net mensuel (hors CP)";
-  document.getElementById("lbl_sbm").textContent = lissage
-    ? "Salaire brut mensuel (CP inclus)" : "Salaire brut mensuel (hors CP)";
-
-  set("r_cp_weeks", fmtN(cp_weeks) + " sem.");
-  if (lissage) {
-    set("r_cp_lissage", fmt(cp_mensuel), "gray");
-  } else {
-    set("r_cp_annual",
-      fmt(cp_annual) + " (" + (cp_maintien >= cp_1_10 ? "maintien" : "1/10") + ")", "");
-  }
-
-  set("r_tan",   fmt(tan));
-  set("r_fem",   fmt(fem));
-  set("r_snf",   fmt(snf_display));
-  // CMG mois avec 1 semaine de CP (mode séparé uniquement)
-  // Base réduite : montant payé = salaire + frais pour (njm - jpw) jours travaillés
-  // Mois avec 1 sem. CP : salaire normal + indemnité CP d'1 semaine - frais d'entretien de la semaine CP
+  // CP mois séparé
   const cp_per_week  = cp_weeks > 0 ? cp_annual / cp_weeks : 0;
   const snf_cp_month = snf_display + cp_per_week - fej * jpw;
   const cmg_cp       = snf_cp_month * facteur;
   const rac_cp       = snf_cp_month - cmg_cp;
 
-  const isSepare = modeCP === "separe";
-  document.getElementById("lbl_cmg").textContent     = isSepare ? "CMG mois sans CP" : "CMG estimé";
-  document.getElementById("row_cmg_cp").style.display = isSepare ? "" : "none";
-  document.getElementById("row_rac_cp").style.display  = isSepare ? "" : "none";
+  // Store for comparison
+  results[s] = { cmg, rac, ci, coutNet, tan };
 
-  set("r_cmg",    fmt(cmg),    "blue");
-  set("r_cmg_cp", fmt(cmg_cp), "blue");
-  set("r_rac",    fmt(rac),    rac > 0 ? "red" : "green");
-  set("r_rac_cp", fmt(rac_cp), rac_cp > 0 ? "red" : "green");
-  set("r_ran",    fmt(rac * 12), rac > 0 ? "red" : "green");
-  set("r_ci",    nbCi > 0 ? fmt(ci)           : "—", "blue");
-  set("r_net",   nbCi > 0 ? fmt(coutNet)      : "—", coutNet > 0 ? "red" : "green");
-  set("r_netan", nbCi > 0 ? fmt(coutNet * 12) : "—", coutNet > 0 ? "red" : "green");
+  // Display
+  const lissage = modeCP[s] === 'lissage';
+  const separe  = !lissage;
+
+  set(s, 'tjn', fmt(tjn));
+  set(s, 'tjb', fmt(tjb));
+  set(s, 'snm', lissage ? fmt(snm) : fmt(snm_hors_cp));
+  set(s, 'sbm', lissage ? fmt(sbm) : fmt(snm_hors_cp / TAUX_BRUT_NET));
+  document.getElementById('lbl_snm_' + s).textContent = lissage ? 'Salaire net mensuel (CP inclus)' : 'Salaire net mensuel (hors CP)';
+  document.getElementById('lbl_sbm_' + s).textContent = lissage ? 'Salaire brut mensuel (CP inclus)' : 'Salaire brut mensuel (hors CP)';
+
+  set(s, 'cp_weeks', fmtN(cp_weeks) + ' sem.');
+  if (lissage) {
+    set(s, 'cp_lissage', fmt(cp_mensuel), 'gray');
+  } else {
+    set(s, 'cp_annual', fmt(cp_annual) + ' (' + (cp_maintien >= cp_1_10 ? 'maintien' : '1/10') + ')', '');
+  }
+  set(s, 'tan', fmt(tan));
+  set(s, 'fem', fmt(fem));
+  set(s, 'snf', fmt(snf_display));
+
+  document.getElementById('lbl_cmg_' + s).textContent = separe ? 'CMG mois sans CP' : 'CMG estimé';
+  document.getElementById('row_cmg_cp_' + s).style.display = separe ? '' : 'none';
+  document.getElementById('row_rac_cp_' + s).style.display = separe ? '' : 'none';
+
+  set(s, 'cmg',    fmt(cmg),    s === 'b' ? 'purple' : 'blue');
+  set(s, 'cmg_cp', fmt(cmg_cp), s === 'b' ? 'purple' : 'blue');
+  set(s, 'rac',    fmt(rac),    rac > 0 ? 'red' : 'green');
+  set(s, 'rac_cp', fmt(rac_cp), rac_cp > 0 ? 'red' : 'green');
+  set(s, 'ran',    fmt(rac * 12), rac > 0 ? 'red' : 'green');
+  set(s, 'ci',     nbCi > 0 ? fmt(ci)           : '—', s === 'b' ? 'purple' : 'blue');
+  set(s, 'net',    nbCi > 0 ? fmt(coutNet)      : '—', coutNet > 0 ? 'red' : 'green');
+  set(s, 'netan',  nbCi > 0 ? fmt(coutNet * 12) : '—', coutNet > 0 ? 'red' : 'green');
+
+  if (compareMode) updateCompare();
 }
 
-document.querySelectorAll("input").forEach(el => el.addEventListener("input", calculate));
-document.getElementById("garde_alternee").addEventListener("change", calculate);
-["jours_par_semaine", "semaines_par_an"].forEach(id => {
-  document.getElementById(id).addEventListener("input", updateNjmDefault);
-});
-updateNjmDefault();
-calculate();
+function updateCompare() {
+  const a = results.a, b = results.b;
+  if (!a.coutNet || !b.coutNet) return;
+
+  document.getElementById('cmp_cmg_a').textContent    = fmt(a.cmg);
+  document.getElementById('cmp_cmg_b').textContent    = fmt(b.cmg);
+  document.getElementById('cmp_rac_a').textContent    = fmt(a.rac);
+  document.getElementById('cmp_rac_b').textContent    = fmt(b.rac);
+  document.getElementById('cmp_ci_a').textContent     = fmt(a.ci);
+  document.getElementById('cmp_ci_b').textContent     = fmt(b.ci);
+  document.getElementById('cmp_net_a').textContent    = fmt(a.coutNet);
+  document.getElementById('cmp_net_b').textContent    = fmt(b.coutNet);
+  document.getElementById('cmp_netan_a').textContent  = fmt(a.coutNet * 12);
+  document.getElementById('cmp_netan_b').textContent  = fmt(b.coutNet * 12);
+
+  function diff(va, vb, id, invert) {
+    const d = vb - va;
+    const el = document.getElementById(id);
+    if (Math.abs(d) < 0.01) { el.textContent = '='; el.style.color = '#888'; return; }
+    const better = invert ? d < 0 : d > 0;
+    el.textContent = (d > 0 ? '+' : '') + fmt(d) + ' S' + (better ? '1' : '2') + ' ✓';
+    el.style.color = better ? '#1A237E' : '#7B1FA2';
+  }
+  diff(a.cmg,     b.cmg,     'cmp_cmg_diff',   false);  // plus de CMG = mieux
+  diff(b.rac,     a.rac,     'cmp_rac_diff',   false);  // moins de RAC = mieux (invert sign)
+  diff(a.ci,      b.ci,      'cmp_ci_diff',    false);
+  diff(b.coutNet, a.coutNet, 'cmp_net_diff',   false);
+  diff(b.coutNet * 12, a.coutNet * 12, 'cmp_netan_diff', false);
+
+  const netDiff = b.coutNet - a.coutNet;
+  const verdict = document.getElementById('cmp_verdict');
+  if (Math.abs(netDiff) < 0.5) {
+    verdict.textContent = 'Les deux scénarios ont un coût équivalent.';
+  } else if (netDiff > 0) {
+    verdict.textContent = `Scénario 1 est moins cher de ${fmt(Math.abs(netDiff))} / mois (${fmt(Math.abs(netDiff * 12))} / an).`;
+  } else {
+    verdict.textContent = `Scénario 2 est moins cher de ${fmt(Math.abs(netDiff))} / mois (${fmt(Math.abs(netDiff * 12))} / an).`;
+  }
+}
+
+function calculate() {
+  calculateScenario('a');
+  if (compareMode) calculateScenario('b');
+}
+
+function toggleCompare() {
+  compareMode = !compareMode;
+  const btn = document.getElementById('btn_compare_toggle');
+  btn.classList.toggle('active', compareMode);
+  btn.textContent = compareMode ? '✕ Masquer scénario 2' : '⇄ Comparer 2 scénarios';
+
+  document.getElementById('card_in_b').style.display  = compareMode ? '' : 'none';
+  document.getElementById('card_res_b').style.display = compareMode ? '' : 'none';
+  document.getElementById('compare_panel').style.display = compareMode ? '' : 'none';
+
+  const grid = document.getElementById('main_grid');
+  grid.classList.toggle('compare-mode', compareMode);
+
+  document.getElementById('lbl_card_in_a').textContent  = compareMode ? 'Scénario 1 — Conditions de garde' : 'Conditions de garde';
+  document.getElementById('lbl_card_res_a').textContent = compareMode ? 'Scénario 1 — Bilan financier' : 'Bilan financier employeur';
+
+  if (compareMode) calculateScenario('b');
+}
+
+// Event listeners scenario A
+document.querySelectorAll('#card_in_a input, #card_in_a select').forEach(el =>
+  el.addEventListener('input', () => calculateScenario('a'))
+);
+['jours_par_semaine', 'semaines_par_an'].forEach(name =>
+  document.getElementById(name).addEventListener('input', () => updateNjmDefault('a'))
+);
+
+// Event listeners scenario B
+document.querySelectorAll('#card_in_b input, #card_in_b select').forEach(el =>
+  el.addEventListener('input', () => calculateScenario('b'))
+);
+['b_jours_par_semaine', 'b_semaines_par_an'].forEach(name =>
+  document.getElementById(name).addEventListener('input', () => updateNjmDefault('b'))
+);
+
+updateNjmDefault('a');
+updateNjmDefault('b');
+calculateScenario('a');
 
 function exportPDF() {
   const btn = document.querySelector('.export-btn');
   btn.disabled = true;
   btn.textContent = 'Génération…';
-
-  // Capture the page with html2canvas then embed in jsPDF
   html2canvas(document.body, {
     scale: 2,
     useCORS: true,
@@ -541,7 +711,7 @@ function exportPDF() {
   }).then(canvas => {
     const { jsPDF } = window.jspdf;
     const imgData = canvas.toDataURL('image/jpeg', 0.92);
-    const pdfW = 210; // A4 mm
+    const pdfW = 210;
     const pdfH = Math.round(canvas.height * pdfW / canvas.width);
     const doc = new jsPDF({ unit: 'mm', format: [pdfW, Math.max(pdfH, 297)], orientation: 'portrait' });
     doc.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
