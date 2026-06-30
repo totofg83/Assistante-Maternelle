@@ -441,8 +441,8 @@
       <thead>
         <tr>
           <th style="text-align:left;color:#555"></th>
-          <th class="s1">Scénario 1</th>
-          <th class="s2">Scénario 2</th>
+          <th class="s1">Scénario 1<br><span id="cmp_mode_a" style="font-size:11px;font-weight:400;color:#888"></span></th>
+          <th class="s2">Scénario 2<br><span id="cmp_mode_b" style="font-size:11px;font-weight:400;color:#888"></span></th>
           <th style="color:#888;font-size:12px">Différence</th>
         </tr>
       </thead>
@@ -639,6 +639,9 @@ function calculateScenario(s) {
 function updateCompare() {
   const a = results.a, b = results.b;
   if (!a.coutNet || !b.coutNet) return;
+
+  document.getElementById('cmp_mode_a').textContent = modeCP.a === 'lissage' ? 'Lissage' : 'Séparé';
+  document.getElementById('cmp_mode_b').textContent = modeCP.b === 'lissage' ? 'Lissage' : 'Séparé';
 
   document.getElementById('cmp_snm_a').textContent   = fmt(a.snm);
   document.getElementById('cmp_snm_b').textContent   = fmt(b.snm);
