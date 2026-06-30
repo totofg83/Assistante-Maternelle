@@ -447,11 +447,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td class="lbl">CMG / mois</td><td class="val" id="cmp_cmg_a">—</td><td class="val" id="cmp_cmg_b">—</td><td class="val" id="cmp_cmg_diff" style="color:#888;font-size:12px">—</td></tr>
-        <tr><td class="lbl">Reste à charge / mois</td><td class="val" id="cmp_rac_a">—</td><td class="val" id="cmp_rac_b">—</td><td class="val" id="cmp_rac_diff" style="font-size:12px">—</td></tr>
-        <tr><td class="lbl">Crédit d'impôt / mois</td><td class="val" id="cmp_ci_a">—</td><td class="val" id="cmp_ci_b">—</td><td class="val" id="cmp_ci_diff" style="color:#888;font-size:12px">—</td></tr>
-        <tr><td class="lbl">Coût réel net / mois</td><td class="val" id="cmp_net_a">—</td><td class="val" id="cmp_net_b">—</td><td class="val" id="cmp_net_diff" style="font-size:12px">—</td></tr>
-        <tr><td class="lbl">Coût réel net / an</td><td class="val" id="cmp_netan_a">—</td><td class="val" id="cmp_netan_b">—</td><td class="val" id="cmp_netan_diff" style="font-size:12px">—</td></tr>
+        <tr><td class="lbl">Salaire net mensuel</td><td class="val" id="cmp_snm_a">—</td><td class="val" id="cmp_snm_b">—</td><td class="val" id="cmp_snm_diff" style="font-size:12px">—</td></tr>
+        <tr><td class="lbl">CMG / mois <span style="color:#888;font-size:11px">(↑ mieux)</span></td><td class="val" id="cmp_cmg_a">—</td><td class="val" id="cmp_cmg_b">—</td><td class="val" id="cmp_cmg_diff" style="font-size:12px">—</td></tr>
+        <tr><td class="lbl">Reste à charge / mois <span style="color:#888;font-size:11px">(↓ mieux)</span></td><td class="val" id="cmp_rac_a">—</td><td class="val" id="cmp_rac_b">—</td><td class="val" id="cmp_rac_diff" style="font-size:12px">—</td></tr>
+        <tr><td class="lbl">Crédit d'impôt / mois <span style="color:#888;font-size:11px">(↑ mieux)</span></td><td class="val" id="cmp_ci_a">—</td><td class="val" id="cmp_ci_b">—</td><td class="val" id="cmp_ci_diff" style="font-size:12px">—</td></tr>
+        <tr><td class="lbl">Coût réel net / mois <span style="color:#888;font-size:11px">(↓ mieux)</span></td><td class="val" id="cmp_net_a">—</td><td class="val" id="cmp_net_b">—</td><td class="val" id="cmp_net_diff" style="font-size:12px">—</td></tr>
+        <tr><td class="lbl">Coût réel net / an <span style="color:#888;font-size:11px">(↓ mieux)</span></td><td class="val" id="cmp_netan_a">—</td><td class="val" id="cmp_netan_b">—</td><td class="val" id="cmp_netan_diff" style="font-size:12px">—</td></tr>
       </tbody>
     </table>
     <p id="cmp_verdict" class="cmp-diff"></p>
@@ -575,7 +576,8 @@ function calculateScenario(s) {
   const rac_cp       = snf_cp_month - cmg_cp;
 
   // Store for comparison
-  results[s] = { cmg, rac, ci, coutNet, tan };
+  const snm_display = lissage ? snm : snm_hors_cp;
+  results[s] = { cmg, rac, ci, coutNet, tan, snm: snm_display };
 
   // Display
   const lissage = modeCP[s] === 'lissage';
@@ -618,30 +620,35 @@ function updateCompare() {
   const a = results.a, b = results.b;
   if (!a.coutNet || !b.coutNet) return;
 
-  document.getElementById('cmp_cmg_a').textContent    = fmt(a.cmg);
-  document.getElementById('cmp_cmg_b').textContent    = fmt(b.cmg);
-  document.getElementById('cmp_rac_a').textContent    = fmt(a.rac);
-  document.getElementById('cmp_rac_b').textContent    = fmt(b.rac);
-  document.getElementById('cmp_ci_a').textContent     = fmt(a.ci);
-  document.getElementById('cmp_ci_b').textContent     = fmt(b.ci);
-  document.getElementById('cmp_net_a').textContent    = fmt(a.coutNet);
-  document.getElementById('cmp_net_b').textContent    = fmt(b.coutNet);
-  document.getElementById('cmp_netan_a').textContent  = fmt(a.coutNet * 12);
-  document.getElementById('cmp_netan_b').textContent  = fmt(b.coutNet * 12);
+  document.getElementById('cmp_snm_a').textContent   = fmt(a.snm);
+  document.getElementById('cmp_snm_b').textContent   = fmt(b.snm);
+  document.getElementById('cmp_cmg_a').textContent   = fmt(a.cmg);
+  document.getElementById('cmp_cmg_b').textContent   = fmt(b.cmg);
+  document.getElementById('cmp_rac_a').textContent   = fmt(a.rac);
+  document.getElementById('cmp_rac_b').textContent   = fmt(b.rac);
+  document.getElementById('cmp_ci_a').textContent    = fmt(a.ci / 12);
+  document.getElementById('cmp_ci_b').textContent    = fmt(b.ci / 12);
+  document.getElementById('cmp_net_a').textContent   = fmt(a.coutNet);
+  document.getElementById('cmp_net_b').textContent   = fmt(b.coutNet);
+  document.getElementById('cmp_netan_a').textContent = fmt(a.coutNet * 12);
+  document.getElementById('cmp_netan_b').textContent = fmt(b.coutNet * 12);
 
-  function diff(va, vb, id, invert) {
+  // higherIsBetter=true : S avec la valeur la plus haute gagne
+  // higherIsBetter=false : S avec la valeur la plus basse gagne
+  function diff(va, vb, elId, higherIsBetter) {
     const d = vb - va;
-    const el = document.getElementById(id);
+    const el = document.getElementById(elId);
     if (Math.abs(d) < 0.01) { el.textContent = '='; el.style.color = '#888'; return; }
-    const better = invert ? d < 0 : d > 0;
-    el.textContent = (d > 0 ? '+' : '') + fmt(d) + ' S' + (better ? '1' : '2') + ' ✓';
-    el.style.color = better ? '#1A237E' : '#7B1FA2';
+    const sBetter = higherIsBetter ? (d > 0 ? 2 : 1) : (d < 0 ? 2 : 1);
+    el.textContent = 'S' + sBetter + ' ✓';
+    el.style.color = sBetter === 1 ? '#1A237E' : '#7B1FA2';
   }
-  diff(a.cmg,     b.cmg,     'cmp_cmg_diff',   false);  // plus de CMG = mieux
-  diff(b.rac,     a.rac,     'cmp_rac_diff',   false);  // moins de RAC = mieux (invert sign)
-  diff(a.ci,      b.ci,      'cmp_ci_diff',    false);
-  diff(b.coutNet, a.coutNet, 'cmp_net_diff',   false);
-  diff(b.coutNet * 12, a.coutNet * 12, 'cmp_netan_diff', false);
+  diff(a.snm,        b.snm,        'cmp_snm_diff',   false); // salaire : plus bas = moins cher
+  diff(a.cmg,        b.cmg,        'cmp_cmg_diff',   true);  // CMG : plus élevé = mieux
+  diff(a.rac,        b.rac,        'cmp_rac_diff',   false); // RAC : plus bas = mieux
+  diff(a.ci / 12,    b.ci / 12,    'cmp_ci_diff',    true);  // CI : plus élevé = mieux
+  diff(a.coutNet,    b.coutNet,    'cmp_net_diff',   false); // coût net : plus bas = mieux
+  diff(a.coutNet*12, b.coutNet*12, 'cmp_netan_diff', false);
 
   const netDiff = b.coutNet - a.coutNet;
   const verdict = document.getElementById('cmp_verdict');
