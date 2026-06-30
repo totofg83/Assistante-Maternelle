@@ -741,33 +741,86 @@ updateNjmDefault('b');
 calculateScenario('a');
 
 function exportPDF() {
-  const btn = document.querySelector('.export-btn');
-  btn.disabled = true;
-  btn.textContent = 'Génération…';
-  html2canvas(document.body, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: '#F0F4F8',
-    windowWidth: 960,
-    windowHeight: document.body.scrollHeight
-  }).then(canvas => {
-    const { jsPDF } = window.jspdf;
-    const imgData = canvas.toDataURL('image/jpeg', 0.92);
-    const pdfW = 210;
-    const pdfH = Math.round(canvas.height * pdfW / canvas.width);
-    const doc = new jsPDF({ unit: 'mm', format: [pdfW, Math.max(pdfH, 297)], orientation: 'portrait' });
-    doc.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
-    doc.save('simulation_assistante_maternelle.pdf');
-    btn.disabled = false;
-    btn.textContent = '⬇ Exporter en PDF';
-  }).catch(() => {
-    btn.disabled = false;
-    btn.textContent = '⬇ Exporter en PDF';
-    alert('Erreur lors de la génération du PDF.');
-  });
+  const date = new Date().toLocaleDateString('fr-FR');
+
+  function bloc(s, label) {
+    const r = results[s];
+    const mode = modeCP[s] === 'lissage' ? 'Lissage' : 'Séparé';
+    const hCP = modeCP[s] === 'separe' ? ' <small>(hors CP)</small>' : '';
+    const getv = id => document.getElementById(s === 'b' ? 'b_r_' + id : 'r_' + id)?.textContent || '—';
+    const geti = id => document.getElementById(s === 'b' ? 'b_' + id : id)?.value || '—';
+
+    const rows = [
+      ['Tarif horaire net', geti('tarif_horaire_net') + ' €'],
+      ['Heures / jour', geti('heures_par_jour')],
+      ['Jours / semaine', geti('jours_par_semaine')],
+      ['Semaines / an', geti('semaines_par_an')],
+      ['Jours CP / an', geti('nb_jours_cp')],
+      ['Frais entretien / jour', geti('frais_entretien_jour') + ' €'],
+      ['Jours travaillés / mois', geti('nb_jours_mois')],
+      null,
+      ['Salaire net mensuel' + hCP, getv('snm')],
+      ['Salaire brut mensuel' + hCP, getv('sbm')],
+      ['Total annuel net (CP inclus)', getv('tan')],
+      ['Frais d\'entretien / mois' + hCP, getv('fem')],
+      ['Salaire net + frais' + hCP, getv('snf')],
+      null,
+      ['Revenus du foyer', geti('revenus_mensuels') + ' €'],
+      ['CMG estimé' + hCP, getv('cmg')],
+      ['Reste à charge / mois' + hCP, getv('rac')],
+      ['Reste à charge / an (CP inclus)', getv('ran')],
+      null,
+      ['Crédit d\'impôt / an', getv('ci')],
+      ['Coût réel net / mois' + hCP, getv('net')],
+      ['Coût réel net / an (CP inclus)', getv('netan')],
+    ];
+
+    return `
+      <div class="bloc">
+        <h2>${label} — <span class="mode">${mode}</span></h2>
+        <table>
+          ${rows.map(r => r === null
+            ? '<tr class="sep"><td colspan="2"></td></tr>'
+            : `<tr><td class="lbl">${r[0]}</td><td class="val">${r[1]}</td></tr>`
+          ).join('')}
+        </table>
+      </div>`;
+  }
+
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+  <title>Simulation Assistante Maternelle</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 12px; color: #111; padding: 20px; }
+    h1 { font-size: 16px; color: #1A237E; text-align: center; margin-bottom: 4px; }
+    .subtitle { text-align: center; color: #888; font-size: 11px; margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: ${compareMode ? '1fr 1fr' : '1fr'}; gap: 20px; }
+    .bloc h2 { font-size: 13px; color: #1A237E; border-bottom: 2px solid #C5CAE9; padding-bottom: 5px; margin-bottom: 8px; }
+    .mode { font-weight: normal; font-size: 11px; color: #888; }
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: 4px 2px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+    td.lbl { color: #555; width: 60%; }
+    td.val { font-weight: 600; text-align: right; }
+    tr.sep td { padding: 3px 0; border: none; }
+    small { font-size: 10px; color: #999; font-weight: normal; }
+    .footer { margin-top: 16px; font-size: 10px; color: #aaa; text-align: center; }
+    @media print { body { padding: 10px; } button { display: none; } }
+  </style>
+  </head><body>
+  <h1>Simulateur Assistante Maternelle</h1>
+  <p class="subtitle">Simulation du ${date}</p>
+  <div class="grid">
+    ${bloc('a', compareMode ? 'Scénario 1' : 'Bilan financier')}
+    ${compareMode ? bloc('b', 'Scénario 2') : ''}
+  </div>
+  <p class="footer">⚠ CMG et crédit d'impôt sont des estimations — vérifiez sur pajemploi.urssaf.fr et impots.gouv.fr</p>
+  <script>window.onload = () => window.print();<\/script>
+  </body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>
 </html>
