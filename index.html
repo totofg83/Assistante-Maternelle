@@ -527,9 +527,101 @@ updateNjmDefault();
 calculate();
 
 function exportPDF() {
-  window.print();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const blue = [26, 35, 126];
+  const gray = [100, 100, 100];
+  const dark = [30, 30, 30];
+  const red  = [198, 40, 40];
+  const green= [46, 125, 50];
+
+  let y = 15;
+  const lm = 15, rCol = 130;
+
+  doc.setFontSize(16).setFont(undefined,'bold').setTextColor(...blue);
+  doc.text('Simulateur Assistante Maternelle', 105, y, {align:'center'});
+  y += 7;
+  doc.setFontSize(9).setFont(undefined,'normal').setTextColor(...gray);
+  const today = new Date().toLocaleDateString('fr-FR');
+  doc.text('Simulation du ' + today, 105, y, {align:'center'});
+  y += 8;
+  doc.setDrawColor(200,200,200).line(lm, y, 195, y);
+  y += 6;
+
+  function section(title) {
+    doc.setFontSize(11).setFont(undefined,'bold').setTextColor(...blue);
+    doc.text(title, lm, y); y += 6;
+  }
+  function row(label, valId, color) {
+    const el = document.getElementById(valId);
+    const val = el ? el.textContent : '—';
+    doc.setFontSize(9).setFont(undefined,'normal').setTextColor(...dark);
+    doc.text(label, lm, y);
+    doc.setFont(undefined,'bold').setTextColor(...(color||dark));
+    doc.text(val, 195, y, {align:'right'});
+    doc.setFont(undefined,'normal').setTextColor(...dark);
+    y += 5;
+  }
+  function inputRow(label, valId) {
+    const el = document.getElementById(valId);
+    const val = el ? el.value : '—';
+    doc.setFontSize(9).setFont(undefined,'normal').setTextColor(...gray);
+    doc.text(label, lm, y);
+    doc.setTextColor(...dark);
+    doc.text(val, 195, y, {align:'right'});
+    y += 5;
+  }
+  function sep() { doc.setDrawColor(220,220,220).line(lm, y, 195, y); y += 4; }
+
+  section('Conditions de garde');
+  inputRow('Tarif horaire net (€)', 'tarif_horaire_net');
+  inputRow('Heures / jour', 'heures_par_jour');
+  inputRow('Jours / semaine', 'jours_par_semaine');
+  inputRow('Semaines / an', 'semaines_par_an');
+  inputRow('Frais entretien / jour (€)', 'frais_entretien_jour');
+  inputRow('Jours travaillés / mois', 'nb_jours_mois');
+  sep();
+
+  section('Salaire & Frais');
+  row('Tarif journalier net', 'r_tjn');
+  row('Tarif journalier brut', 'r_tjb');
+  row('Salaire net mensuel', 'r_snm');
+  row('Salaire brut mensuel', 'r_sbm');
+  row('Total annuel net', 'r_tan');
+  row('Frais entretien / mois', 'r_fem');
+  row('Salaire net + frais', 'r_snf');
+  sep();
+
+  section('CMG (aide CAF)');
+  inputRow('Revenus du foyer (€)', 'revenus_mensuels');
+  inputRow('Nb enfants à charge', 'nb_enfants');
+  row('CMG estimé / mois', 'r_cmg', blue);
+  row('Reste à charge / mois', 'r_rac', red);
+  if (document.getElementById('r_cmg_cp')) {
+    const cpRows = document.getElementById('cp_rows_sep');
+    if (cpRows && cpRows.style.display !== 'none') {
+      row('CMG mois avec CP', 'r_cmg_cp', blue);
+      row('Reste à charge mois CP', 'r_rac_cp', red);
+    }
+  }
+  sep();
+
+  section('Crédit d\'impôt (art. 200 quater B)');
+  row('Crédit d\'impôt / an', 'r_ci');
+  row('Crédit d\'impôt / mois', 'r_ci_m');
+  sep();
+
+  section('Coût réel net');
+  row('Coût réel net / mois', 'r_netm', green);
+  row('Coût réel net / an', 'r_netan', green);
+
+  y += 4;
+  doc.setFontSize(8).setFont(undefined,'italic').setTextColor(...gray);
+  doc.text('⚠ CMG et crédit d\'impôt sont des estimations — vérifiez sur pajemploi.urssaf.fr et impots.gouv.fr', lm, y);
+
+  doc.save('simulation_assistante_maternelle.pdf');
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>
 </html>
