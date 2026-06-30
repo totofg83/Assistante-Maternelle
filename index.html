@@ -585,12 +585,13 @@ function calculateScenario(s) {
 
   const snm_only = lissage ? snm : snm_hors_cp;
   const rac_hors_fem = rac - fem;
-  // En séparé : les mois avec CP ont des frais réduits de fej*jpw (semaine CP sans frais)
+  // En séparé : RAC annuel = RAC mensuel × 12 + indemnité CP nette de CMG
   const ran_hors_fem = separe
-    ? rac_hors_fem * 12 + (rac_cp - rac + fej * jpw) * cp_weeks
+    ? rac_hors_fem * 12 + cp_annual * (1 - facteur)
     : rac_hors_fem * 12;
   const coutNet_hors_fem = rac_hors_fem - ci / 12;
-  results[s] = { cmg, rac, rac_hors_fem, ran_hors_fem, ci, coutNet: coutNet_hors_fem, tan, snm: snm_only, ran, coutNetAn };
+  const coutNetAn_hors_fem = ran_hors_fem - ci;
+  results[s] = { cmg, rac, rac_hors_fem, ran_hors_fem, ci, coutNet: coutNet_hors_fem, tan, snm: snm_only, ran, coutNetAn: coutNetAn_hors_fem };
 
   set(s, 'tjn', fmt(tjn));
   set(s, 'tjb', fmt(tjb));
@@ -620,7 +621,7 @@ function calculateScenario(s) {
   set(s, 'ran',    fmt(ran_hors_fem),  ran_hors_fem > 0 ? 'red' : 'green');
   set(s, 'ci',     nbCi > 0 ? fmt(ci)                  : '—', s === 'b' ? 'purple' : 'blue');
   set(s, 'net',    nbCi > 0 ? fmt(coutNet_hors_fem)    : '—', coutNet_hors_fem > 0 ? 'red' : 'green');
-  set(s, 'netan',  nbCi > 0 ? fmt(ran_hors_fem - ci)   : '—', (ran_hors_fem - ci) > 0 ? 'red' : 'green');
+  set(s, 'netan',  nbCi > 0 ? fmt(coutNetAn_hors_fem)   : '—', coutNetAn_hors_fem > 0 ? 'red' : 'green');
 
   if (compareMode) updateCompare();
 }
