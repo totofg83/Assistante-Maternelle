@@ -803,6 +803,13 @@ function exportPDF() {
     td.val { font-weight: 600; text-align: right; }
     tr.sep td { padding: 3px 0; border: none; }
     small { font-size: 10px; color: #999; font-weight: normal; }
+    .recap { margin-top: 20px; }
+    .recap h2 { font-size: 13px; color: #1A237E; border-bottom: 2px solid #C5CAE9; padding-bottom: 5px; margin-bottom: 8px; }
+    table.cmp { width: 100%; border-collapse: collapse; }
+    table.cmp th { padding: 5px 4px; text-align: center; font-size: 11px; border-bottom: 2px solid #C5CAE9; }
+    table.cmp th:first-child { text-align: left; }
+    table.cmp td.diff { color: #555; font-size: 11px; }
+    .verdict { margin-top: 8px; font-size: 11px; color: #555; font-style: italic; }
     .footer { margin-top: 16px; font-size: 10px; color: #aaa; text-align: center; }
     @media print { body { padding: 10px; } button { display: none; } }
   </style>
@@ -813,6 +820,32 @@ function exportPDF() {
     ${bloc('a', compareMode ? 'Scénario 1' : 'Bilan financier')}
     ${compareMode ? bloc('b', 'Scénario 2') : ''}
   </div>
+  ${compareMode ? `
+  <div class="recap">
+    <h2>Comparaison des scénarios</h2>
+    <table class="cmp">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Scénario 1<br><span class="mode">${modeCP.a === 'lissage' ? 'Lissage' : 'Séparé'}</span></th>
+          <th>Scénario 2<br><span class="mode">${modeCP.b === 'lissage' ? 'Lissage' : 'Séparé'}</span></th>
+          <th>Différence</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${['cmp_snm','cmp_snf','cmp_tan','cmp_cmg','cmp_rac','cmp_ci','cmp_net','cmp_netan'].map(id => {
+          const lbl = document.querySelector(`[id="${id}_a"]`)?.closest('tr')?.querySelector('.lbl')?.innerHTML || id;
+          return `<tr>
+            <td class="lbl">${lbl}</td>
+            <td class="val">${document.getElementById(id+'_a')?.innerHTML || '—'}</td>
+            <td class="val">${document.getElementById(id+'_b')?.innerHTML || '—'}</td>
+            <td class="val diff">${document.getElementById(id+'_diff')?.textContent || '—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    <p class="verdict">${document.getElementById('cmp_verdict')?.textContent || ''}</p>
+  </div>` : ''}
   <p class="footer">⚠ CMG et crédit d'impôt sont des estimations — vérifiez sur pajemploi.urssaf.fr et impots.gouv.fr</p>
   <script>window.onload = () => window.print();<\/script>
   </body></html>`;
