@@ -643,10 +643,16 @@ function updateCompare() {
   document.getElementById('cmp_mode_a').textContent = modeCP.a === 'lissage' ? 'Lissage' : 'Séparé';
   document.getElementById('cmp_mode_b').textContent = modeCP.b === 'lissage' ? 'Lissage' : 'Séparé';
 
-  document.getElementById('cmp_snm_a').textContent   = fmt(a.snm);
-  document.getElementById('cmp_snm_b').textContent   = fmt(b.snm);
-  document.getElementById('cmp_snf_a').textContent   = fmt(a.snf);
-  document.getElementById('cmp_snf_b').textContent   = fmt(b.snf);
+  const noteHorsCP = '<br><span style="color:#999;font-size:10px">(hors CP)</span>';
+  function setVal(id, text, addNote) {
+    document.getElementById(id).innerHTML = text + (addNote ? noteHorsCP : '');
+  }
+  const sepA = modeCP.a === 'separe', sepB = modeCP.b === 'separe';
+
+  setVal('cmp_snm_a', fmt(a.snm), sepA);
+  setVal('cmp_snm_b', fmt(b.snm), sepB);
+  setVal('cmp_snf_a', fmt(a.snf), sepA);
+  setVal('cmp_snf_b', fmt(b.snf), sepB);
   document.getElementById('cmp_tan_a').textContent   = fmt(a.tan);
   document.getElementById('cmp_tan_b').textContent   = fmt(b.tan);
   document.getElementById('cmp_cmg_a').textContent   = fmt(a.cmg);
@@ -655,8 +661,8 @@ function updateCompare() {
   document.getElementById('cmp_rac_b').textContent   = fmt(b.rac_hors_fem);
   document.getElementById('cmp_ci_a').textContent    = fmt(a.ci / 12);
   document.getElementById('cmp_ci_b').textContent    = fmt(b.ci / 12);
-  document.getElementById('cmp_net_a').textContent   = fmt(a.coutNet);
-  document.getElementById('cmp_net_b').textContent   = fmt(b.coutNet);
+  setVal('cmp_net_a', fmt(a.coutNet), sepA);
+  setVal('cmp_net_b', fmt(b.coutNet), sepB);
   document.getElementById('cmp_netan_a').textContent = fmt(a.coutNetAn);
   document.getElementById('cmp_netan_b').textContent = fmt(b.coutNetAn);
 
