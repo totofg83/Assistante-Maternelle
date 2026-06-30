@@ -448,6 +448,8 @@
       </thead>
       <tbody>
         <tr><td class="lbl">Salaire net mensuel</td><td class="val" id="cmp_snm_a">—</td><td class="val" id="cmp_snm_b">—</td><td class="val" id="cmp_snm_diff" style="font-size:12px">—</td></tr>
+        <tr><td class="lbl">Salaire net + frais / mois</td><td class="val" id="cmp_snf_a">—</td><td class="val" id="cmp_snf_b">—</td><td class="val" id="cmp_snf_diff" style="font-size:12px">—</td></tr>
+        <tr><td class="lbl">Salaire annuel net</td><td class="val" id="cmp_tan_a">—</td><td class="val" id="cmp_tan_b">—</td><td class="val" id="cmp_tan_diff" style="font-size:12px">—</td></tr>
         <tr><td class="lbl">CMG / mois <span style="color:#888;font-size:11px">(↑ mieux)</span></td><td class="val" id="cmp_cmg_a">—</td><td class="val" id="cmp_cmg_b">—</td><td class="val" id="cmp_cmg_diff" style="font-size:12px">—</td></tr>
         <tr><td class="lbl">RAC / mois hors frais entretien <span style="color:#888;font-size:11px">(↓ mieux)</span></td><td class="val" id="cmp_rac_a">—</td><td class="val" id="cmp_rac_b">—</td><td class="val" id="cmp_rac_diff" style="font-size:12px">—</td></tr>
         <tr><td class="lbl">Crédit d'impôt / mois <span style="color:#888;font-size:11px">(↑ mieux)</span></td><td class="val" id="cmp_ci_a">—</td><td class="val" id="cmp_ci_b">—</td><td class="val" id="cmp_ci_diff" style="font-size:12px">—</td></tr>
@@ -591,7 +593,7 @@ function calculateScenario(s) {
     : rac_hors_fem * 12;
   const coutNet_hors_fem = rac_hors_fem - ci / 12;
   const coutNetAn_hors_fem = ran_hors_fem - ci;
-  results[s] = { cmg, rac, rac_hors_fem, ran_hors_fem, ci, coutNet: coutNet_hors_fem, tan, snm: snm_only, ran, coutNetAn: coutNetAn_hors_fem };
+  results[s] = { cmg, rac, rac_hors_fem, ran_hors_fem, ci, coutNet: coutNet_hors_fem, tan, snm: snm_only, snf: snf_display, ran, coutNetAn: coutNetAn_hors_fem };
 
   set(s, 'tjn', fmt(tjn));
   set(s, 'tjb', fmt(tjb));
@@ -632,6 +634,10 @@ function updateCompare() {
 
   document.getElementById('cmp_snm_a').textContent   = fmt(a.snm);
   document.getElementById('cmp_snm_b').textContent   = fmt(b.snm);
+  document.getElementById('cmp_snf_a').textContent   = fmt(a.snf);
+  document.getElementById('cmp_snf_b').textContent   = fmt(b.snf);
+  document.getElementById('cmp_tan_a').textContent   = fmt(a.tan);
+  document.getElementById('cmp_tan_b').textContent   = fmt(b.tan);
   document.getElementById('cmp_cmg_a').textContent   = fmt(a.cmg);
   document.getElementById('cmp_cmg_b').textContent   = fmt(b.cmg);
   document.getElementById('cmp_rac_a').textContent   = fmt(a.rac_hors_fem);
@@ -654,6 +660,8 @@ function updateCompare() {
     el.style.color = sBetter === 1 ? '#1A237E' : '#7B1FA2';
   }
   diff(a.snm,          b.snm,          'cmp_snm_diff',   false);
+  diff(a.snf,          b.snf,          'cmp_snf_diff',   false);
+  diff(a.tan,          b.tan,          'cmp_tan_diff',   false);
   diff(a.cmg,          b.cmg,          'cmp_cmg_diff',   true);
   diff(a.rac_hors_fem, b.rac_hors_fem, 'cmp_rac_diff',   false);
   diff(a.ci / 12,    b.ci / 12,    'cmp_ci_diff',    true);  // CI : plus élevé = mieux
