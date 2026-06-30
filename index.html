@@ -579,9 +579,12 @@ function calculateScenario(s) {
   const lissage = modeCP[s] === 'lissage';
   const separe  = !lissage;
 
-  // Store for comparison
-  const snm_display = lissage ? snm : snm_hors_cp;
-  results[s] = { cmg, rac, ci, coutNet, tan, snm: snm_display };
+  // RAC annuel : en séparé on ajoute le surcoût de chaque semaine de CP
+  const ran = separe ? rac * 12 + (rac_cp - rac) * cp_weeks : rac * 12;
+  const coutNetAn = separe ? coutNet * 12 + (rac_cp - rac) * cp_weeks : coutNet * 12;
+
+  // Store for comparison (snf_display inclut les frais d'entretien)
+  results[s] = { cmg, rac, ci, coutNet, tan, snm: snf_display, ran, coutNetAn };
 
   set(s, 'tjn', fmt(tjn));
   set(s, 'tjb', fmt(tjb));
@@ -608,10 +611,10 @@ function calculateScenario(s) {
   set(s, 'cmg_cp', fmt(cmg_cp), s === 'b' ? 'purple' : 'blue');
   set(s, 'rac',    fmt(rac),    rac > 0 ? 'red' : 'green');
   set(s, 'rac_cp', fmt(rac_cp), rac_cp > 0 ? 'red' : 'green');
-  set(s, 'ran',    fmt(rac * 12), rac > 0 ? 'red' : 'green');
-  set(s, 'ci',     nbCi > 0 ? fmt(ci)           : '—', s === 'b' ? 'purple' : 'blue');
-  set(s, 'net',    nbCi > 0 ? fmt(coutNet)      : '—', coutNet > 0 ? 'red' : 'green');
-  set(s, 'netan',  nbCi > 0 ? fmt(coutNet * 12) : '—', coutNet > 0 ? 'red' : 'green');
+  set(s, 'ran',    fmt(ran), ran > 0 ? 'red' : 'green');
+  set(s, 'ci',     nbCi > 0 ? fmt(ci)         : '—', s === 'b' ? 'purple' : 'blue');
+  set(s, 'net',    nbCi > 0 ? fmt(coutNet)    : '—', coutNet > 0 ? 'red' : 'green');
+  set(s, 'netan',  nbCi > 0 ? fmt(coutNetAn)  : '—', coutNetAn > 0 ? 'red' : 'green');
 
   if (compareMode) updateCompare();
 }
@@ -630,8 +633,8 @@ function updateCompare() {
   document.getElementById('cmp_ci_b').textContent    = fmt(b.ci / 12);
   document.getElementById('cmp_net_a').textContent   = fmt(a.coutNet);
   document.getElementById('cmp_net_b').textContent   = fmt(b.coutNet);
-  document.getElementById('cmp_netan_a').textContent = fmt(a.coutNet * 12);
-  document.getElementById('cmp_netan_b').textContent = fmt(b.coutNet * 12);
+  document.getElementById('cmp_netan_a').textContent = fmt(a.coutNetAn);
+  document.getElementById('cmp_netan_b').textContent = fmt(b.coutNetAn);
 
   // higherIsBetter=true : S avec la valeur la plus haute gagne
   // higherIsBetter=false : S avec la valeur la plus basse gagne
@@ -647,17 +650,17 @@ function updateCompare() {
   diff(a.cmg,        b.cmg,        'cmp_cmg_diff',   true);  // CMG : plus élevé = mieux
   diff(a.rac,        b.rac,        'cmp_rac_diff',   false); // RAC : plus bas = mieux
   diff(a.ci / 12,    b.ci / 12,    'cmp_ci_diff',    true);  // CI : plus élevé = mieux
-  diff(a.coutNet,    b.coutNet,    'cmp_net_diff',   false); // coût net : plus bas = mieux
-  diff(a.coutNet*12, b.coutNet*12, 'cmp_netan_diff', false);
+  diff(a.coutNet,    b.coutNet,    'cmp_net_diff',   false);
+  diff(a.coutNetAn,  b.coutNetAn,  'cmp_netan_diff', false);
 
-  const netDiff = b.coutNet - a.coutNet;
+  const netDiff = b.coutNetAn - a.coutNetAn;
   const verdict = document.getElementById('cmp_verdict');
   if (Math.abs(netDiff) < 0.5) {
     verdict.textContent = 'Les deux scénarios ont un coût équivalent.';
   } else if (netDiff > 0) {
-    verdict.textContent = `Scénario 1 est moins cher de ${fmt(Math.abs(netDiff))} / mois (${fmt(Math.abs(netDiff * 12))} / an).`;
+    verdict.textContent = `Scénario 1 est moins cher de ${fmt(Math.abs(netDiff / 12))} / mois (${fmt(Math.abs(netDiff))} / an).`;
   } else {
-    verdict.textContent = `Scénario 2 est moins cher de ${fmt(Math.abs(netDiff))} / mois (${fmt(Math.abs(netDiff * 12))} / an).`;
+    verdict.textContent = `Scénario 2 est moins cher de ${fmt(Math.abs(netDiff / 12))} / mois (${fmt(Math.abs(netDiff))} / an).`;
   }
 }
 
