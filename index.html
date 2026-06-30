@@ -377,16 +377,16 @@
 
     <hr class="sep">
     <div class="section-title">Coût mensuel employeur</div>
-    <div class="result-row"><span class="label">Frais d'entretien / mois</span><span class="value" id="r_fem">—</span></div>
-    <div class="result-row"><span class="label">Salaire net + frais</span><span class="value" id="r_snf">—</span></div>
+    <div class="result-row"><span class="label" id="lbl_fem_a">Frais d'entretien / mois</span><span class="value" id="r_fem">—</span></div>
+    <div class="result-row"><span class="label" id="lbl_snf_a">Salaire net + frais</span><span class="value" id="r_snf">—</span></div>
 
     <hr class="sep">
     <div class="section-title">CMG (CAF)</div>
     <div class="result-row"><span class="label" id="lbl_cmg_a">CMG estimé</span><span class="value blue" id="r_cmg">—</span></div>
     <div class="result-row" id="row_cmg_cp_a" style="display:none"><span class="label">CMG mois avec 1 sem. CP</span><span class="value blue" id="r_cmg_cp">—</span></div>
-    <div class="highlight-row"><span class="label">Reste à charge / mois</span><span class="value" id="r_rac">—</span></div>
+    <div class="highlight-row"><span class="label" id="lbl_rac_a">Reste à charge / mois</span><span class="value" id="r_rac">—</span></div>
     <div class="result-row" id="row_rac_cp_a" style="display:none"><span class="label">Reste à charge mois avec 1 sem. CP</span><span class="value" id="r_rac_cp">—</span></div>
-    <div class="result-row"><span class="label">Reste à charge / an</span><span class="value" id="r_ran">—</span></div>
+    <div class="result-row"><span class="label" id="lbl_ran_a">Reste à charge / an</span><span class="value" id="r_ran">—</span></div>
 
     <hr class="sep">
     <div class="section-title">Crédit d'impôt (art. 200 quater B)</div>
@@ -413,16 +413,16 @@
 
     <hr class="sep">
     <div class="section-title">Coût mensuel employeur</div>
-    <div class="result-row"><span class="label">Frais d'entretien / mois</span><span class="value" id="b_r_fem">—</span></div>
-    <div class="result-row"><span class="label">Salaire net + frais</span><span class="value" id="b_r_snf">—</span></div>
+    <div class="result-row"><span class="label" id="lbl_fem_b">Frais d'entretien / mois</span><span class="value" id="b_r_fem">—</span></div>
+    <div class="result-row"><span class="label" id="lbl_snf_b">Salaire net + frais</span><span class="value" id="b_r_snf">—</span></div>
 
     <hr class="sep">
     <div class="section-title">CMG (CAF)</div>
     <div class="result-row"><span class="label" id="lbl_cmg_b">CMG estimé</span><span class="value purple" id="b_r_cmg">—</span></div>
     <div class="result-row" id="row_cmg_cp_b" style="display:none"><span class="label">CMG mois avec 1 sem. CP</span><span class="value purple" id="b_r_cmg_cp">—</span></div>
-    <div class="highlight-row"><span class="label">Reste à charge / mois</span><span class="value" id="b_r_rac">—</span></div>
+    <div class="highlight-row"><span class="label" id="lbl_rac_b">Reste à charge / mois</span><span class="value" id="b_r_rac">—</span></div>
     <div class="result-row" id="row_rac_cp_b" style="display:none"><span class="label">Reste à charge mois avec 1 sem. CP</span><span class="value" id="b_r_rac_cp">—</span></div>
-    <div class="result-row"><span class="label">Reste à charge / an</span><span class="value" id="b_r_ran">—</span></div>
+    <div class="result-row"><span class="label" id="lbl_ran_b">Reste à charge / an</span><span class="value" id="b_r_ran">—</span></div>
 
     <hr class="sep">
     <div class="section-title">Crédit d'impôt (art. 200 quater B)</div>
@@ -609,6 +609,14 @@ function calculateScenario(s) {
     set(s, 'cp_annual', fmt(cp_annual) + ' (' + (cp_maintien >= cp_1_10 ? 'maintien' : '1/10') + ')', '');
   }
   set(s, 'tan', fmt(tan));
+
+  const note = separe ? ' <span style="color:#999;font-size:11px">(hors CP)</span>' : '';
+  function lbl(id) { return document.getElementById(id); }
+  lbl('lbl_fem_'  + s).innerHTML = 'Frais d\'entretien / mois' + note;
+  lbl('lbl_snf_'  + s).innerHTML = 'Salaire net + frais' + note;
+  lbl('lbl_rac_'  + s).innerHTML = 'Reste à charge / mois' + note;
+  lbl('lbl_ran_'  + s).innerHTML = separe ? 'Reste à charge / an <span style="color:#999;font-size:11px">(CP inclus)</span>' : 'Reste à charge / an';
+
   set(s, 'fem', fmt(fem));
   set(s, 'snf', fmt(snf_display));
 
